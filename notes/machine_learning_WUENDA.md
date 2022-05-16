@@ -180,3 +180,111 @@ $$x_j^{(i)}$$: value of feature $$j$$ in $$i^{th}$$ training example
 
 $$h_{\theta}(x)=\theta_0+\theta_1x_1+\theta_2x_2+...+\theta_xx_n$$
 
+For convenience of notation, define $$x_0=1$$ ($$x_0^{(i)}=1$$)
+
+$$X=[x_0, x_1, x_2, ..., x_n]^T \in R^{n+1}$$
+
+$$\Theta=[\theta_0, \theta_1, \theta_2,...,\theta_n]^T\in R^{n+1}$$
+
+Then: $$h_\theta(x)=\Theta^TX$$ -> **Multivariate Linear Regression**
+
+## Multivariate Gradient Descent
+
+Hypothetis: $$h_{\theta}(x)=\theta_0+\theta_1x_1+\theta_2x_2+...+\theta_xx_n$$
+
+Parameters: $$\Theta=[\theta_0, \theta_1, \theta_2,...,\theta_n]^T\in R^{n+1}$$
+
+Cost function: $$J(\Theta)=\frac{1}{2m}\sum_{i=1}^m(h_{\theta}(x^{(i)})-y^{(i)})^2$$
+
+Gradient Descent:
+
+repeat{
+
+​    $$\theta_j := \theta_j-\alpha \frac{\partial}{\partial \theta_j}J(\theta_0,..., \theta_n)$$ (simultaneously update for every $$j=0, ..., n$$)
+
+​    ( $$\frac{\partial}{\partial \theta_j}J(\Theta)=\frac{1}{m}\sum_{i=1}^m(h_{\theta}x^{(i)}-y^{(i)})*x^{(i)}_j$$)
+
+}
+
+* $$\theta_0 := \theta_0-\alpha\frac{1}{m}\sum_{i=1}^m(h_{\theta}x^{(i)}-y^{(i)})*x^{(i)}_0$$
+* $$\theta_1 := \theta_0-\alpha\frac{1}{m}\sum_{i=1}^m(h_{\theta}x^{(i)}-y^{(i)})*x^{(i)}_1$$
+* $$\theta_2 := \theta_0-\alpha\frac{1}{m}\sum_{i=1}^m(h_{\theta}x^{(i)}-y^{(i)})*x^{(i)}_2$$
+* ......
+
+## Feature Scaling
+
+**Idea: make sure features are on a similar scale.**
+
+e.g: $$x_1$$: size (0-2000 feet2), $$x_2$$: number of bedrooms(1-5)
+
+**After Scaling**:
+
+* $$x_1$$: size/2000
+* $$x_2$$: number of bedrooms/5
+
+**Feature Scaling: Get every feature into approxiamtely a $$-1 \leq x_i \leq 1$$ range.**
+
+**Mean Normalization:** Replace $$x_i$$ with $$x_i-u_i$$ to make features have approximatelt zero mean **(Do not apply to $$x_0=1$$)**
+
+* $$x_1=\frac{size-1000}{2000}$$
+* $$x_2=\frac{No.bedrooms-2}{5}$$
+
+More generally, $$x_1 = \frac{x_1-u_1}{s_1}$$
+
+* $$u_1$$: avarage value of $$x_1$$
+* $$s_1$$: range value (max-min), also called standard deviation
+
+## Learning rate 
+
+$$J(\Theta)$$ should decrease after every iteration.
+
+Example automatic convergence test:
+
+* Declare convergence if $$J(\Theta)$$ decreases by less than $$10^{-3}$$ in one iteration.
+
+But if $$\alpha$$ is too small, gradient descent can be very slow.
+
+Summary:
+
+* If $$\alpha$$ is too small: slow convergence.
+* if $$\alpha$$ is too large: $$J(\Theta)$$ may not decrease on every iteration, may not converge.
+* To choose $$\alpha$$, try $$..., 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, ...$$
+
+## Features and Polynomial Regression
+
+Polynomial Regression:
+
+![image-20220516182123529](machine_learning_WUENDA.assets/image-20220516182123529.png)
+
+$$h_{\theta}(x)=\theta_0+\theta_1x_1+\theta_2x_2+\theta_3x_3=\theta_0+\theta_1(size)+\theta_2(size)^2+\theta_3(size)^3$$  
+
+* $$x_1=(size)$$
+* $$x_2=(size)^2$$
+* $$x_3=(size)^3$$
+
+**It's important to do feature scaling.**
+
+
+
+## Normal Equation
+
+Method to solve for $$\Theta$$ analytically.
+
+$$\theta \in R^{n+1}, $$ $$J(\Theta)=\frac{1}{2m}\sum_{i=1}^m(h_{\theta}(x^{(i)})-y^{(i)})^2$$, $$\frac{\partial}{\partial \theta_j}J(\Theta)=...=0$$, for every$$j$$.
+
+* Solve for $$\theta_0, \theta_1, ..., \theta_n$$
+* $$\Theta = (X^TX)^{-1}X^Ty$$
+
+Generally, we have $$(x^{(1)}, y^{(1)}), ..., (x^{(m)}, y^{(m)})$$ and $$n$$ features.
+
+$$x^{(i)}=[x_0^{(i)}, x_1^{(i)}, ...,x_n^{(i)}] \in R^{n+1}$$
+
+$$X:m\times (n+1), y:$$$$m$$-dimensional vector
+
+| Gradient Descent                     | Normal Equation                                              |
+| ------------------------------------ | ------------------------------------------------------------ |
+| Need to choose $$\alpha$$.           | No need to choose $$\alpha$$.                                |
+| Needs many iterations.               | Don't need to iterate.                                       |
+| Works well even when $$n$$ is large. | Need to compute $$ (X^TX)^{-1}$$, $$O(n^3)$$, slow if $$n$$ is large |
+
+**For the specific model of linear regression, normal equation is an alternative of gradient descent.**
