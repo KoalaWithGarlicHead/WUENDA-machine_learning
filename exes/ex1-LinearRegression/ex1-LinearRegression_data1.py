@@ -125,7 +125,27 @@ def sk_model():
     print(model.coef_, model.intercept_) #权重矩阵 偏移量
     print(model.score(X, y))
 
+def normal_equation():
+    import pandas as pd
+    path = "ex1data1.txt"
+    data = pd.read_csv(path, header=None, names=["Population", "Profit"])
+    data.insert(0, "Ones", 1)  # "Ones"为列名称
+
+    cols = data.shape[1]  # 列数
+    X = data.iloc[:, 0:cols - 1]  # 去除y列数据 得到矩阵X :的含义是取所有行
+    y = data.iloc[:, cols - 1:cols]  # y列数据
+    # 转换为矩阵
+    X = np.matrix(X.values)
+    y = np.matrix(y.values)
+
+
+    theta = (np.linalg.inv(X.T*X))*(X.T)*y
+    print(theta)
+    # 值有差距
+
+
 if __name__=="__main__":
     my()
-    standardized()
-    sk_model()
+    # standardized()
+    # sk_model()
+    normal_equation()

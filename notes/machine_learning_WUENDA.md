@@ -288,3 +288,80 @@ $$X:m\times (n+1), y:$$$$m$$-dimensional vector
 | Works well even when $$n$$ is large. | Need to compute $$ (X^TX)^{-1}$$, $$O(n^3)$$, slow if $$n$$ is large |
 
 **For the specific model of linear regression, normal equation is an alternative of gradient descent.**
+
+Question: What if $X^TX$ is non-invertible? Computer can still handle the questions.
+
+*   Redundant Features (linearly dependent)
+    *   $x_1$: size in feet2
+    *   $x_2$: size in m2
+*   Too many features ($m\leq n$)
+    *   delete some features or use regularization.
+
+
+
+# Classification
+
+$y \in \{0,1\}$
+
+*   0: Negative class
+*   1: Positive class
+
+Threshold classifier output $h_\theta(x)$ at 0.5:
+
+*   if $h_\theta(x) \geq 0.5$, predict "$y=1$"
+*   if $h_\theta(x) <0.5$, predict "$y=0$"
+
+**Logistic Regression**: $0 \leq h_\theta(x)\leq 1$ actually a classification problem.
+
+
+
+## Hypothesis Representation
+
+$h_\theta(x) = g(\theta^Tx)$
+
+Sigmoid Function / Logistic Function: $g(z) = \frac{1}{1+e^{-z}}$
+
+Then, $h_\theta(x) = \frac{1}{1+e^{-\theta^Tx}}$
+
+<img src="machine_learning_WUENDA.assets/image-20220516221942238.png" alt="image-20220516221942238" style="zoom:25%;" />
+
+**Interpretation of Hypothesis Output:**
+
+$h_\theta(x)$: estimated probability that $y=1$ on input $x$.
+
+*   If $x=[x_0, x_1]^T=[1, tumorSize]^T, h_\theta(x)=0.7$, means the 70% chance of tumor being malignant
+*   $h_\theta(x)=p(y=1|x;\theta)$: probability that $y=1$, given $x$, parameterized by $\theta$.
+*   $y=$ 0 or 1
+    *   $P(y=0|x;\theta)+P(y=1|x;\theta)=1$
+    *   $P(y=0|x;\theta) = 1-P(y=1|x;\theta)$
+
+
+
+## Decision Boundary
+
+Suppose predict "$y=1$" if $h_\theta(x) \geq 0.5$
+
+*   That is, when $\theta^Tx \geq 0$
+
+Predict "$y=0$" if $h_\theta(x) <0.5$
+
+*   That is, when $\theta^Tx<0$
+
+![image-20220516224135486](machine_learning_WUENDA.assets/image-20220516224135486.png)
+
+$h_\theta(x)=g(\theta_0+\theta_1x_1+\theta_2x_2)$
+
+When $\theta=[-3,1,1]^T$, predict "$y=1$" if $-3+x_1+x_2\geq0$
+
+**Non-linear decision boundaries**:
+
+![image-20220516224526560](machine_learning_WUENDA.assets/image-20220516224526560.png)
+
+$h_\theta(x)=g(\theta_0+\theta_1x_1+\theta_2x_2+\theta_3x_1^2+\theta_4x_2^2)$
+
+When $\theta=[-1, 0, 0, 1, 1]^T$, predict "$y=1$" if $-1+x_1^2+x_2^2 \geq 0$.
+
+We use $\theta$ **but not the training set** to difine decision boundary.
+
+*   The training set may be used to fit the parameter $\theta$.
+
