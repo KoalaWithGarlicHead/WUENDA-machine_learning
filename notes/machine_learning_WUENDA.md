@@ -323,7 +323,7 @@ Sigmoid Function / Logistic Function: $g(z) = \frac{1}{1+e^{-z}}$
 
 Then, $h_\theta(x) = \frac{1}{1+e^{-\theta^Tx}}$
 
-<img src="machine_learning_WUENDA.assets/image-20220516221942238.png" alt="image-20220516221942238" style="zoom:25%;" />
+![551652855689_.pic](machine_learning_WUENDA.assets/551652855689_.pic.jpg)
 
 **Interpretation of Hypothesis Output:**
 
@@ -347,7 +347,7 @@ Predict "$y=0$" if $h_\theta(x) <0.5$
 
 *   That is, when $\theta^Tx<0$
 
-![image-20220516224135486](machine_learning_WUENDA.assets/image-20220516224135486.png)
+![561652855689_.pic](machine_learning_WUENDA.assets/561652855689_.pic.jpg)
 
 $h_\theta(x)=g(\theta_0+\theta_1x_1+\theta_2x_2)$
 
@@ -355,7 +355,7 @@ When $\theta=[-3,1,1]^T$, predict "$y=1$" if $-3+x_1+x_2\geq0$
 
 **Non-linear decision boundaries**:
 
-![image-20220516224526560](machine_learning_WUENDA.assets/image-20220516224526560.png)
+![571652855689_.pic](machine_learning_WUENDA.assets/571652855689_.pic.jpg)
 
 $h_\theta(x)=g(\theta_0+\theta_1x_1+\theta_2x_2+\theta_3x_1^2+\theta_4x_2^2)$
 
@@ -364,4 +364,225 @@ When $\theta=[-1, 0, 0, 1, 1]^T$, predict "$y=1$" if $-1+x_1^2+x_2^2 \geq 0$.
 We use $\theta$ **but not the training set** to difine decision boundary.
 
 *   The training set may be used to fit the parameter $\theta$.
+
+
+
+## Cost Function
+
+Training set: $\{(x^{(1)}, y^{(1)}), (x^{(2)}, y^{(2)}),..., (x^{(m)}, y^{(m)})\}$
+
+$m$ examples $x \in [x_0, x_1, ..., x_n]^T, x_0=1, y \in \{0,1\}$ 
+
+$h_\theta(x)=\frac{1}{1+e^{-\theta^Tx}}$
+
+How to choose parameter $\theta$?
+
+**Logistic Regression cost function:**
+$$
+cost(h_\theta(x), y)= \begin{cases}
+-log(h_\theta(x)),\quad &y=1 \\
+-log(1-h_\theta(x)),\quad &y=0
+\end{cases}
+$$
+![image-20220517113831944](machine_learning_WUENDA.assets/image-20220517113831944.png)
+
+![image-20220517114352638](machine_learning_WUENDA.assets/image-20220517114352638.png)
+
+$cost=0$ if $y=1. h_\theta(x)=1$.
+
+* But as $h_\theta(x) \rightarrow 0$, $cost \rightarrow \infty$
+* Captures intuition that if $h_\theta(x)=0$ (predict $P(y=1|x;\theta)=0$), but actually $y=1$, we will penalize learning algorithm by a very large cost.
+
+$cost=0$ if $y=0. h_\theta(x)=0$.
+
+* But as $h_\theta(x) \rightarrow 1$, $cost \rightarrow \infty$
+* Captures intuition that if $h_\theta(x)=1$ (predict $P(y=1|x;\theta)=1$), but actually $y=0$, we will penalize learning algorithm by a very large cost.
+
+
+
+## Simplified cost function and gradient descent
+
+$J(\theta)=\frac{1}{m}\sum_{i=1}^mCost(h_\theta(x^{(i)}), y^{(i)})$
+
+$cost(h_\theta(x), y)= \begin{cases}
+-log(h_\theta(x)),\quad &y=1 \\
+-log(1-h_\theta(x)),\quad &y=0
+\end{cases}$
+
+Note: $y\in \{0,1\}$ always
+
+**Equivalent**:$cost(h_\theta(x), y)=-ylog(h_\theta(x))-(1-y)log(1-h_\theta(x))$
+
+so, $J(\theta)=\frac{1}{m}\sum_{i=1}^mCost(h_\theta(x^{(i)}), y^{(i)})=-\frac{1}{m}\sum_{i=1}^m[y^{(i)}log(h_\theta(x^{(i)})+(1-y^{(i)})log(1-h_\theta(x^{(i)}))]$
+
+To fit $\theta$, we should $min_{\theta}J(\theta)$
+
+To make a prediction given new $x$, output: $h_\theta(x)=\frac{1}{1+e^{-\theta^Tx}}$, which means $p(y=1|x;\theta)$
+
+
+
+**Gradient Descent:**
+
+$J(\theta)=-\frac{1}{m}\sum_{i=1}^m[y^{(i)}log(h_\theta(x^{(i)})+(1-y^{(i)})log(1-h_\theta(x^{(i)}))]$
+
+Want $min_{\theta}J(\theta)$
+
+Repeat {
+
+​    $\theta_j:=\theta_j-\alpha\frac{\partial}{\partial\theta_j}J(\theta)$ (simultaneously update all $\theta_j$)
+
+}
+
+In that, $\frac{\partial}{\partial\theta_j}J(\theta) = \frac{1}{m}\sum_{i=1}^m[h_\theta(x^{(i)})-y^{(i)}]x^{(i)}_j$, **looks identical to linear regression**.
+
+
+
+## Advanced Optimization
+
+Cost Function $J(\theta)$, want $min_\theta J(\theta)$
+
+Given $\theta$, we have code that can compute:
+
+* $J(\theta)$
+* $\frac{\partial}{\partial\theta_j}J(\theta)$   (for $j=0,1,...,m$)
+
+Optimazation algorithms:
+
+* Gradient Descent
+* Conjugate gradient
+* BFGS
+* L-BFGS
+
+The last three algorithms:
+
+* Advantages:
+  * No need to manually pick $\alpha$
+  * Often faster than gradient descent
+* Disadvantages:
+  * More complex
+
+
+
+## Multi-class classification: one-vs-all
+
+Example:
+
+* Email folding/tagging: Work; Friends; Family; Hobby
+* Medical diagrams: Not ill; Cold; Flu
+* Weather: Sunny; Cloudy; Rainy; Snowy
+
+![image-20220517150225645](machine_learning_WUENDA.assets/image-20220517150225645.png)
+
+**One-vs-all / One-vs-rest**
+
+![image-20220517150432310](machine_learning_WUENDA.assets/image-20220517150432310.png)
+
+$h_\theta^{(i)}(x)=P(y=i|x;\theta)  (i=1,2,3)$
+
+* $h_\theta^{(1)}(x)$ to classify triangle
+* $h_\theta^{(2)}(x)$ to classify square
+* $h_\theta^{(3)}(x)$ to classify cross
+
+**One-vs-all**: 
+
+* Train a logistic regression classifier $h_\theta^{(i)}(x)$ for each class $i$ to predict the probablity that $y=i$.
+* On a new input $x$, to make a prediction, pick the class $i$ that $max_ih_\theta^{(i)}(x)$.
+
+# Regularization
+
+## The problem of overfitting
+
+<img src="machine_learning_WUENDA.assets/image-20220518165617638.png" alt="image-20220518165617638" style="zoom:50%;" />
+
+"Underfitting" "highbias"
+
+"overfitting" "high variance"
+
+**Overfitting**:If we have too many features, the learned hypothesis may fit the training set very well ($j(\theta)\approx0$), but fail to generalize to new examples.
+
+Addressing overfitting:
+
+* Reduce number of features
+  * Manually select what features to keep
+  * model selection algorithm
+* Regularization
+  * Keep all the features, but reduce magnitude/valus of parameter $\theta$
+  * Works well when we have a lot of features, each of which contributes a bit to predicting $y$.
+
+## Cost Function
+
+<img src="machine_learning_WUENDA.assets/image-20220518165617638.png" alt="image-20220518165617638" style="zoom:50%;" />
+
+Suppose we penalize and make $\theta_3, \theta_4$ very small:
+
+$min_\theta\frac{1}{2m}\sum_{i=1}^m(h_{\theta}(x^{(i)})-y^{(i)})^2+1000\theta_3^2+1000\theta_4^2$ --> $\theta_3 \approx 0, \theta_4 \approx 0$
+
+**Regularization**
+
+Small values parameters $\theta_0, \theta_1, ..., \theta_n$
+
+* "Simpler" hypothesis
+* Less prone to overfitting
+
+e.g.: Housing:
+
+* Features: $x_1, x_2, ..., x_{100}$
+* Parameters: $\theta_1, \theta_2, ..., \theta_{100}$
+
+$J(\theta)=\frac{1}{2m}[\sum_{i=1}^m(h_{\theta}(x^{(i)})-y^{(i)})^2+\lambda \sum_{j=1}^n\theta_j^2]$
+
+* $\lambda \sum_{j=1}^n\theta_j^2$: regularization term
+  * $\lambda$: regularization parameter, controls the trade-off between 2 different goals
+    * fit the training data well
+    * keep the parameter small
+  * if $\lambda$ is set to an extremely large value, like $10^{10}$, then the penalizing on the parameters would be too heavy, so all the $\theta_1, \theta_2,... \approx 0$
+    * In this situation, $h_\theta(x)=\theta_0$ --> **underfitting**
+
+
+
+## Regularize Linear Regression
+
+**regularized linear regression**
+
+$J(\theta)=\frac{1}{2m}[\sum_{i=1}^m(h_{\theta}(x^{(i)})-y^{(i)})^2+\lambda \sum_{j=1}^n\theta_j^2]$
+
+**Gradient Descent:**
+
+repeat until convergence(收敛){
+
+​    $$\theta_0 := \theta_0-\alpha \frac{1}{m}\sum_{i=1}^m(h_{\theta}x^{(i)}-y^{(i)})$$
+
+​    $$\theta_j := \theta_j-\alpha [\frac{1}{m}\sum_{i=1}^m(h_{\theta}x^{(i)}-y^{(i)})x^{(i)}+\frac{\lambda}{m}\theta_j], j=1,2,3...,n$$
+
+} 
+
+ $$\theta_j := \theta_j(1-\alpha\frac{\lambda}{m})-\alpha\frac{1}{m}\sum_{i=1}^m(h_{\theta}x^{(i)}-y^{(i)})x^{(i)}, j=1,2,3...,n$$
+
+* $1-\alpha\frac{\lambda}{m}<1$: slightly making $\theta_j$ smaller 略小于1
+
+**Normal Equation**
+
+$X=[(x^{(1)})^T, ..., (x^{(m)})^T]^T \in R^{m\times(n+1)}$
+
+$y=[y^{(1)}, ..., y^{(m)}]^T \in R^m$
+
+$\theta = (X^TX+\lambda \begin{bmatrix}0&0&0...0\\0&1&0...0\\0&0&1...0\\...\\0&0&0...1 \end{bmatrix})^{-1}X^Ty$, where $M$ is a $(n+1)\times(n+1)$ sqaure matrix，**same for non-invertible $X$**
+
+
+
+## Regularized Logistic Regression
+
+$J(\theta)=-\frac{1}{m}\sum_{i=1}^m[y^{(i)}log(h_\theta(x^{(i)})+(1-y^{(i)})log(1-h_\theta(x^{(i)}))]+\frac{\lambda}{2m}\sum_{j=1}^n\theta_j^2$
+
+**Gradient Descent:**
+
+repeat until convergence(收敛){
+
+​    $$\theta_0 := \theta_0-\alpha \frac{1}{m}\sum_{i=1}^m(h_{\theta}x^{(i)}-y^{(i)})x_0^{{i}}$$
+
+​    $$\theta_j := \theta_j-\alpha [\frac{1}{m}\sum_{i=1}^m(h_{\theta}x^{(i)}-y^{(i)})x^{(i)}+\frac{\lambda}{m}\theta_j], j=1,2,3...,n$$
+
+} 
+
+
 

@@ -143,9 +143,50 @@ def normal_equation():
     print(theta)
     # 值有差距
 
+def scipy_func():
+    import pandas as pd
+    path = "ex1data1.txt"
+    data = pd.read_csv(path, header=None, names=["Population", "Profit"])
+
+    def computeCost(theta, X, y):
+        X = np.matrix(X)
+        y = np.matrix(y)
+        theta = np.matrix(theta)
+        inner = np.power(((X * theta.T) - y), 2)
+        return sum(inner) / 2 * (len(X))
+
+    # 在训练集中添加一列，用向量化的方法解决问题
+    data.insert(0, "Ones", 1)  # "Ones"为列名称
+
+    cols = data.shape[1]  # 列数
+    X = data.iloc[:, 0:cols - 1]  # 去除y列数据 得到矩阵X :的含义是取所有行
+    y = data.iloc[:, cols - 1:cols]  # y列数据
+    # 转换为矩阵
+    X = np.array(X.values)
+    y = np.array(y.values)
+    theta = np.array([0, 0])
+
+    def gradient_descent(theta, X, y):
+        X = np.matrix(X)
+        y = np.matrix(y)
+        theta = np.matrix(theta)
+        parameters = int(theta.ravel().shape[1])
+        grad = np.zeros(parameters)
+
+        error = (X*theta.T)-y
+        for j in range(parameters):
+            term = np.multiply(error, X[:,j])
+            grad[j] = np.sum(term)/len(X)
+
+        return grad
+
+    import scipy.optimize as opt
+    result = opt.fmin_tnc(func=computeCost, x0=theta, fprime=gradient_descent, args=(X, y))
+    print(result)
 
 if __name__=="__main__":
-    my()
+    # my()
     # standardized()
-    # sk_model()
-    normal_equation()
+    sk_model()
+    # normal_equation()
+    scipy_func()
