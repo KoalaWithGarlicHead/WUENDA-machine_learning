@@ -129,5 +129,19 @@ def standardized():
     # func 优化的目标函数，x0：初值，fprime：梯度函数，args:传递给优化参数的函数
     print(result)
 
+def sk_learn():
+    path = "ex2data1.txt"
+    data = pd.read_csv(path, header=None, names=["class1", "class2", "admit"])
+    cols = data.shape[1]
+    X = np.matrix(data.iloc[:, 0:cols - 1].values)
+    y = np.matrix(data.iloc[:, cols - 1:cols].values)
+    from sklearn import linear_model
+    model = linear_model.LogisticRegression(penalty='l2', C=1.0)
+    model.fit(X, y)
+
+    print(model.coef_, model.intercept_)  # 权重矩阵 偏移量
+    print(model.score(X, y))
+
 # my()
-standardized()
+# standardized()
+sk_learn()

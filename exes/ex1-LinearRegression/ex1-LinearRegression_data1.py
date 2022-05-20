@@ -186,7 +186,7 @@ def scipy_func():
 
 if __name__=="__main__":
     # my()
-    # standardized()
+    standardized()
     sk_model()
     # normal_equation()
-    scipy_func()
+    # scipy_func()
