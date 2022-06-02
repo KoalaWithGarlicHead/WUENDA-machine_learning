@@ -586,3 +586,673 @@ repeat until convergence(收敛){
 
 
 
+# Neural Network
+
+## Model Repretation
+
+Neuron model: logistic unit
+
+![image-20220520161013851](machine_learning_WUENDA.assets/image-20220520161013851.png)
+
+$h_\theta(x) = \frac{1}{1+e^{-\theta^tx}}$
+
+$x=[x1, x2, x3, x4]^T, \theta=[\theta_1,\theta_2, \theta_3, \theta_4]^T$. $\theta$ is called "weights" or "parameters".
+
+$x_0$: bias neuron / bias unit. $x_0=1$. Sometimes draw, sometimes nor draw for convenience.
+
+Sigmoid (logistic) activation function: $g(z)=\frac{1}{1+e^{-z}}$
+
+**Neural Network**:
+
+![image-20220520161458353](machine_learning_WUENDA.assets/image-20220520161458353.png)
+
+* not draw: $x_0 = 0$, $a_0^{(2)}=0$, bias unit
+* Layer1: Input layer
+* Layer2: Hidden Layer (every layer that is either not input layer nor not output layer)
+* Layer3: Output Layer
+
+$a_i^{(j)}$: "activation" of unit $i$ in layer $j$.
+
+$\Theta^{(j)}$: matrix of weights controlling funtion mapping from layer $j$ to layer $j+1$.
+
+* $a_1^{(2)}=g(\Theta_{10}^{(1)}x_0+\Theta_{11}^{(1)}x_1+\Theta_{12}^{(1)}x_2+\Theta_{13}^{(1)}x_3)$
+* $a_2^{(2)}=g(\Theta_{20}^{(1)}x_0+\Theta_{21}^{(1)}x_1+\Theta_{22}^{(1)}x_2+\Theta_{23}^{(1)}x_3)$
+* $a_3^{(2)}=g(\Theta_{30}^{(1)}x_0+\Theta_{31}^{(1)}x_1+\Theta_{32}^{(1)}x_2+\Theta_{33}^{(1)}x_3)$
+* $h_\Theta(x)=a_1^{(3)}=g(\Theta_{10}^{(2)}a_0^{(2)}+\Theta_{11}^{(2)}a_1^{(2)}+\Theta_{12}^{(2)}a_2^{(2)}+\Theta_{13}^{(2)}a_3^{(2)})$
+
+If network has $s_j$ units in layer $j$, $s_{j+1}$ units in layer $j+1$, then $\Theta^{(j)}$ would be of dimention $s_{j+1}\times(s_j+1)$
+
+* $\Theta^{(1)} \in R^{3\times 4}$
+* $\Theta^{(2)}\in R^{1 \times 4}$
+
+**Forward propagation: vectorized implememtation**
+
+Define:
+
+* $z_1^{(2)}=\Theta_{10}^{(1)}x_0+\Theta_{11}^{(1)}x_1+\Theta_{12}^{(1)}x_2+\Theta_{13}^{(1)}x_3$
+* $z_2^{(2)}=\Theta_{20}^{(1)}x_0+\Theta_{21}^{(1)}x_1+\Theta_{22}^{(1)}x_2+\Theta_{23}^{(1)}x_3$
+* $z_3^{(2)}=\Theta_{30}^{(1)}x_0+\Theta_{31}^{(1)}x_1+\Theta_{32}^{(1)}x_2+\Theta_{33}^{(1)}x_3$
+
+In this way, we have:
+
+* $a_1^{(2)} = g(z_1^{(2)})$
+* $a_2^{(2)} = g(z_2^{(2)})$
+* $a_3^{(2)} = g(z_3^{(2)})$
+
+$x = [x_0, x_1, x_2, x_3]^T, z^{(2)} = [z_1^{(2)}, z_2^{(2)}, z_3^{(2)}]^T$
+
+So: 
+
+* $z^{(2)}=\Theta^{(1)}x$, $z^{(2)} \in R^3$, and if denote $x$ as $a^{(1)}$, then $z^{(2)}=\Theta^{(1)}a^{(1)}$
+* $a^{(2)}=g(z^{(2)})$, $a^{(2)} \in R^3$
+
+**Add** $a_0^{(2)}=1$, (in this way, $a^{(2)} \in R^4$), then:
+
+* $z^{(3)} = \Theta^{(2)}a^{(2)}$
+  * $z^{(3)}=\Theta_{10}^{(2)}a_0^{(2)}+\Theta_{11}^{(2)}a_1^{(2)}+\Theta_{12}^{(2)}a_2^{(2)}+\Theta_{13}^{(2)}a_3^{(2)}$
+* $h_\Theta(x) = a^{(3)}=g(z^{(3)})$
+
+**What the neural network is doing is just like logstic regression, except that rather then using the original features $x_1, x_2, x_3$, is using the NEW features $a_1, a_2, a_3$.**
+
+* $a_1^{(2)},a_2^{(2)},a_3^{(2)}$ are leanred as function mapping layer 1 to layer 2 of the input
+  * determined by other parameters: $\Theta^{(1)}$.
+
+**architecture**: how the neurons are connected to each other.
+
+
+
+## Examples and intuition
+
+**Simple example: AND**
+
+$x_1, x_2 \in \{0,1\}, y= x_1 \&\& x_2$
+
+![image-20220520172946341](machine_learning_WUENDA.assets/image-20220520172946341.png)
+
+With $\Theta_{10}^{(1)}=-30, \Theta_{11}^{(1)}=20, \Theta_{12}^{(1)}=20$, $h_\Theta(x) = \frac{1}{1+e^{-\theta^Tx}}$
+
+| $x_1$ | $x_2$ | $h_\Theta(x)$    |
+| ----- | ----- | ---------------- |
+| 0     | 0     | $g(-30)\approx0$ |
+| 0     | 1     | $g(-10)\approx0$ |
+| 1     | 0     | $g(-10)\approx0$ |
+| 1     | 1     | $g(10)\approx1$  |
+
+**Simple example: OR**
+
+$x_1, x_2 \in \{0,1\}, y= x_1 || x_2$
+
+![image-20220520173340848](machine_learning_WUENDA.assets/image-20220520173340848.png)
+
+With $\Theta_{10}^{(1)}=-10, \Theta_{11}^{(1)}=20, \Theta_{12}^{(1)}=20$, $h_\Theta(x) = \frac{1}{1+e^{-\theta^Tx}}$
+
+| $x_1$ | $x_2$ | $h_\Theta(x)$    |
+| ----- | ----- | ---------------- |
+| 0     | 0     | $g(-10)\approx0$ |
+| 0     | 1     | $g(10)\approx1$  |
+| 1     | 0     | $g(10)\approx1$  |
+| 1     | 1     | $g(30)\approx1$  |
+
+**Simple Example: Negation**
+
+$x_1 \in \{0,1\}, y = NOT x_1$
+
+![image-20220520173614913](machine_learning_WUENDA.assets/image-20220520173614913.png)
+
+With $\Theta_{10}^{(1)}=10, \Theta_{11}^{(1)}=-20$, $h_\Theta(x) = \frac{1}{1+e^{-\theta^Tx}}$
+
+| $x_1$ | $h_\Theta(x)$      |
+| ----- | ------------------ |
+| 0     | $g(10) \approx 0$  |
+| 1     | $g(-10) \approx 0$ |
+
+
+
+**How to compute (NOT $x_1$) AND (NOT $x_2$)?**
+
+<img src="machine_learning_WUENDA.assets/image-20220520174502485.png" alt="image-20220520174502485" style="zoom:50%;" />
+
+With $\Theta_{10}^{(1)}=10, \Theta_{11}^{(1)}=-20, \Theta_{12}^{(1)}=-20$, $h_\Theta(x) = \frac{1}{1+e^{-\theta^Tx}}$
+
+| $x_1$ | $x_2$ | $h_\Theta(x)$    |
+| ----- | ----- | ---------------- |
+| 0     | 0     | $g(10)\approx1$  |
+| 0     | 1     | $g(-10)\approx0$ |
+| 1     | 0     | $g(-10)\approx0$ |
+| 1     | 1     | $g(-20)\approx0$ |
+
+
+
+**How to compute $x_1$ XNOR $x_2$?**
+
+* XNOR: 同或，相同为1，不同为0
+* $x_1$ XNOR $x_2$ = ($x_1$ and $x_2$) or (NOT $x_1$ and NOT $x_2$)
+
+<img src="machine_learning_WUENDA.assets/image-20220520174726936.png" alt="image-20220520174726936" style="zoom:50%;" />
+
+<img src="machine_learning_WUENDA.assets/流程图 (3).jpg" alt="流程图 (3)" style="zoom:50%;" />
+
+
+
+## Multi-class classification
+
+![image-20220520181319830](machine_learning_WUENDA.assets/image-20220520181319830.png)
+
+$h_\Theta(x) \in R^4$
+
+* $h\Theta(x) \approx [1,0,0,0]^T$, predict as **class1**
+* $h\Theta(x) \approx [0,1,0,0]^T$, predict as **class2**
+* $h\Theta(x) \approx [0,0,1,0]^T$, predict as **class3**
+* ...
+
+Training set: $(x^{(1)}, y^{(1)}), (x^{(2)}, y^{(2)}), ..., (x^{(m)}, y^{(m)})$
+
+* $y^{(i)} \in \{[1,0,0,0]^T, [0,1,0,0]^T, [0,0,1,0]^T, [0,0,0,1]^T\}$
+
+## Cost Function
+
+Training set: $(x^{(1)}, y^{(1)}), (x^{(2)}, y^{(2)}), ..., (x^{(m)}, y^{(m)})$
+
+$L$: total no. of layers in network
+
+$s_l$: no. of units (not including bias unit) in the layer $l$
+
+* Binary classification $y \in \{0,1\}$
+  * 1 output unit
+  * $h_\Theta(x) \in R$
+  * $s_L = 1$
+  * $K=1$
+* Multi-class classification($K$ classes)
+  * $y \in R^k$
+  * $k$ output units
+
+Logstic regression cost function:
+
+$J(\theta)=-\frac{1}{m}\sum_{i=1}^m[y^{(i)}log(h_\theta(x^{(i)})+(1-y^{(i)})log(1-h_\theta(x^{(i)}))]+\frac{\lambda}{2m}\sum_{j=1}^n\theta_j^2$
+
+**Neural Network cost function:**
+
+$h_\Theta(x) \in R^k$, $(h_\Theta(x))_i = i^{th}$output
+
+$J(\Theta) = -\frac{1}{m}\sum_{i=1}^m\sum_{k=1}^K[y^{(i)}_klog(h_\Theta(x^{(i)}))_k+(1-y^{(i)}_k)log(1-(h_\Theta(x^{(i)}))_k)]+\frac{\lambda}{2m}\sum_{l=1}^{L-1}\sum_{i=1}^{s_l}\sum_{j=1}^{s_{l+1}}(\Theta_{ji}^{(l)})^2$
+
+* We don't compute $\Theta_{j0}$ in regularized term.
+
+
+
+## Backpropogation algorithm
+
+$J(\Theta) = -\frac{1}{m}[\sum_{i=1}^m\sum_{k=1}^Ky^{(i)}_klog(h_\Theta(x^{(i)}))_k+(1-y^{(i)}_k)log(1-(h_\Theta(x^{(i)}))_k)]+\frac{\lambda}{2m}\sum_{l=1}^{L-1}\sum_{i=1}^{s_l}\sum_{j=1}^{s_{l+1}}(\Theta_{ji}^{(l)})^2$
+
+Specially, 1 output unit: $J(\Theta) = -\frac{1}{m}[\sum_{i=1}^my^{(i)}log(h_\Theta(x^{(i)}))+(1-y^{(i)})log(1-(h_\Theta(x^{(i)})))]+\frac{\lambda}{2m}\sum_{l=1}^{L-1}\sum_{i=1}^{s_l}\sum_{j=1}^{s_{l+1}}(\Theta_{jl}^{(l)})^2$
+
+Want: $min_\Theta (\Theta)$
+
+Need to compute:
+
+* $J(\Theta)$
+* $\frac{\partial}{\partial\Theta_{ij}^{(l)}}J(\Theta)$
+
+Given one training example $(x,y)$:
+
+Forward propagation:
+
+<img src="machine_learning_WUENDA.assets/image-20220520235845577.png" alt="image-20220520235845577" style="zoom:50%;" />
+
+* $a^{(1)} = x$
+* $z^{(2)} = \Theta^{(1)}a^{(1)}$
+* $a^{(2)} = g(z^{(2)})$, (add $a_0^{(2)}$)
+* $z^{(3)} = \Theta^{(2)}a^{(2)}$
+* $a^{(3)} = g(z^{(3)})$, (add $a_0^{(3)}$)
+* $z^{(4)} = \Theta^{(3)}a^{(3)}$
+* $a^{4} = h_\Theta(x)=g(z^{(4)})$
+
+**Gradient computation: Backpropogatin algorithm**
+
+Intuition: $\delta_j^{(l)}$ = "error" of node $j$ in layer $l$
+
+* $a_j^{(l)}$: the activation of node $j$ in layer $l$
+
+For each output unit (layer $L$=4)
+
+<img src="machine_learning_WUENDA.assets/image-20220521160033334.png" alt="image-20220521160033334" style="zoom:50%;" />
+
+* $\delta_j^{(4)}=a_j^{(4)}-y_j$
+  * $a_j^{(4)} = (h_\Theta(x))_j$
+  * also can be written as: $\delta^{(4)}=a^{(4)}-y$
+* $\delta^{(3)}= (\Theta^{(3)})^T\delta^{(4)}.*g'(z^{(3)})$
+  * $g'(z^{(3)}) = a^{(3)}.*(1-a^{(3)})$
+  * $.*$: 两个矩阵中的各个对应元素相乘，得到一个新的矩阵
+*  $\delta^{(2)}= (\Theta^{(2)})^T\delta^{(3)}.*g'(z^{(2)})$
+* no $\delta^{(1)}$
+* 推导过程：
+  * $\delta^{(l)}=\frac{\partial J(\theta)}{\partial z^{(l)}}$
+  * 推导$\delta^{(3)},\delta^{(2)}$ (链式求导法则)：
+    * $\delta^{(3)} = \frac{\partial J(\theta)}{\partial z^{(l)}}$
+    * $ = \frac{\partial J}{\partial a^{(4)}}\cdot \frac{\partial a^{(4)}}{\partial z^{(4)}}\cdot \frac{\partial z^{(4)}}{\partial a^{(3)}}\cdot \frac{\partial a^{(3)}}{\partial z^{(3)}}$
+    * $ =\left(\frac{-y}{a^{(4)}} + \frac{(1-y)}{1-a^{(4)}}\right)\cdot \frac{\partial g(z^{(4)})}{\partial z^{(4)}}\cdot \theta^{(3)}\cdot \frac{\partial g(z^{(3)})}{\partial z^{(3)}}$
+    * =$\left(\frac{-y}{a^{(4)}} + \frac{(1-y)}{1-a^{(4)}}\right)\cdot a^{(4)}\cdot(1-a^{(4)})\cdot \theta^{(3)}\cdot g'(z^{(3)})$
+    * $=(a^{(4)}-y)\cdot \theta^{(3)}\cdot a^{(3)} \cdot(1-a^{(3)})$
+    * $=(\theta^{(3)})^T\cdot \delta^{(4)}\cdot g'(z^{(3)})$ (考虑维度问题)
+
+
+**Backpropogation algorithm**:
+
+Training set: $(x^{(1)}, y^{(1)}), (x^{(2)}, y^{(2)}), ..., (x^{(m)}, y^{(m)})$
+
+Set $\Delta_{ij}^{(l)} = 0$, for all $i,j,l$, used to compute $\frac{\partial}{\partial\Theta_{ij}^{(l)}}J(\Theta)$
+
+For $i=1,2,...,m$
+
+* Set $a^{(1)} = x^i$
+* Perform forward propogation to compute $a^{(l)}$ for $l=2,3,...L$
+* using $y^{(i)}$, compute $\delta^{(L)}=a^{(L)}-y^{(i)}$
+* Compute: $\delta^{(L-1)}, \delta^{(L-2)}, ... \delta^{(2)}$
+* $\Delta^{(l)}_{ij}:=\Delta^{(l)}_{ij}+a_j^{(l)}\delta_i^{(l+1)}$
+
+$D_{ij}^{(l)} = \frac{1}{m}\Delta_{ij}^{(l)}+\frac{\lambda}{m}\Theta_{ij}^{(l)}$, if $j \neq 0$
+
+$D_{ij}^{(l)} = \frac{1}{m}\Delta_{ij}^{(l)}$, if $j=0$
+
+Then, $\frac{\partial}{\partial\Theta_{ij}^{(l)}}J(\Theta) = D_{ij}^{(l)}$
+
+<img src="machine_learning_WUENDA.assets/image-20220521163127754.png" alt="image-20220521163127754" style="zoom:50%;" />
+
+**What is backpropogation doing?**
+
+$J(\Theta) = -\frac{1}{m}[\sum_{i=1}^my^{(i)}log(h_\Theta(x^{(i)}))+(1-y^{(i)})log(1-(h_\Theta(x^{(i)})))]+\frac{\lambda}{2m}\sum_{l=1}^{L-1}\sum_{i=1}^{s_l}\sum_{j=1}^{s_{l+1}}(\Theta_{jl}^{(l)})^2$
+
+Focusing on a single example $x^{(i)}, y^{(i)}$, the case of 1 output unit, and ignoring regularization ($\lambda = 0$)
+
+Then, $cost(i) = y^{(i)}log(h_\Theta(x^{(i)}))+(1-y^{(i)})log(1-(h_\Theta(x^{(i)})))$
+
+* Thinking is as $cost(i) \approx (h_\Theta(x^{(i)})-y^{(i)})^2$
+* i.e. How well the network is doing on example $i$
+
+<img src="machine_learning_WUENDA.assets/image-20220521164938213.png" alt="image-20220521164938213" style="zoom:50%;" />
+
+In the backpropogation: 
+
+* $\delta_j^{(l)}$ = "error" of cost for $a_j^{(l)}$ (unit $j$ in layer $l$)
+* Formally, $\delta_j^{(l)} = \frac{\partial}{\partial z_j^{(l)}}$, for $j \geq 0$, where $cost(i) = y^{(i)}log(h_\Theta(x^{(i)}))+(1-y^{(i)})log(1-(h_\Theta(x^{(i)})))$
+
+
+
+## Gradient checking
+
+**Numerical estimation of gradients:**
+
+<img src="machine_learning_WUENDA.assets/image-20220521181441124.png" alt="image-20220521181441124" style="zoom:50%;" />
+
+$\frac{d}{d\theta}J(\theta) \approx \frac{J(\theta+\epsilon)- J(\theta-\epsilon)}{2\epsilon}$, $\epsilon = 10^{-4}$
+
+**Paramerter vector $\theta$**
+
+$\theta \in R^n$, e.g. $\theta$ is "unrolled" version of $\Theta^{(1)}, \Theta^{(2)}, \Theta^{(3)}$
+
+$\theta = [\theta_1, \theta_2, \theta_3, ..., \theta_n]$
+
+Then:
+
+* $\frac{\partial}{\partial \theta_1}J(\theta)\approx \frac{J(\theta_1+\epsilon, \theta_2, ..., \theta_n)-J(\theta_1-\epsilon, \theta_2, ..., \theta_n)}{2\epsilon}$
+* $\frac{\partial}{\partial \theta_2}J(\theta)\approx \frac{J(\theta_1, \theta_2+\epsilon, ..., \theta_n)-J(\theta_1, \theta_2-\epsilon, ..., \theta_n)}{2\epsilon}$
+* ...
+* $\frac{\partial}{\partial \theta_n}J(\theta)\approx \frac{J(\theta_1, \theta_2, ..., \theta_n+\epsilon)-J(\theta_1, \theta_2, ..., \theta_n-\epsilon)}{2\epsilon}$
+
+**Remember to check that this numerical gradient $\approx$ Backpropogation**
+
+
+
+## Ramdom Initialization
+
+**Zero initialization**
+
+$\Theta_{ij}^{(l)} = 0$ for all $i,j,l$
+
+In this way, $a_1^{(2)} = a_2^{(2)}, \delta_1^{(2)} = \delta_2^{(2)}$--> $\frac{\partial}{\partial\Theta^{(1)}_{01}}J(\Theta)=\frac{\partial}{\partial\Theta^{(1)}_{02}}J(\Theta)$-->$\Theta^{(1)}_{01}=\Theta^{(1)}_{02}$
+
+After each update, parameters correponding to inputs going into each hidden units are identical
+
+<img src="machine_learning_WUENDA.assets/image-20220521184200103.png" alt="image-20220521184200103" style="zoom:50%;" />
+
+The two dark blue lines, red lines, green lines and light blue lines are both identical.
+
+**Ramdom initializartion: symmetry breaking**
+
+initialize each $\Theta_{ij}^{(l)}$ to a ramdom value in $[-\epsilon, \epsilon]$
+
+
+
+## Putting it together
+
+**Training a neural network**
+
+pick a network architecture (connectivity pattern between nuerons)
+
+* No. of input units: dimension of features $x^{(i)}$
+* No. of output units: number of classes
+* Resonable default: 1 hidden layer, or ud > 1 hidden layer, have same no. of hidden units in every layer (usually the more the better)
+
+1. Ramdomly initialize weights
+
+2. Implement forward propagation to get $h_\Theta(x^{(i)})$ for any $x^{(i)}$
+
+3. Implement code to compute cost function $J(\Theta)$
+
+4. Implement backprapogation to compute partial derivatives $\frac{\partial}{\partial\Theta^{(l)}_{jk}}J(\Theta)$
+
+   * for $i=1,...m$
+     * Perform forward propagation and backpropagation using example $(x^{(i)}, y^{(i)})$
+     * Get activation $a^{(l)}$ and delta terms $\delta^{(l)}$ for $l = 2,3,...,L$
+     * compute $\Delta^{(l)}$
+   * compute $\frac{\partial}{\partial\Theta^{(l)}_{jk}}J(\Theta)$
+
+5. Use gradient checking to compare $\frac{\partial}{\partial\Theta^{(l)}_{jk}}J(\Theta)$ computed using backpropagation v.s. using numerical estimate of gradient of $J(\Theta)$.
+
+   Then disable gradient checking code.
+
+6. Use gradient descent or advanced optimization method with backpropagation to try to minimize $J(\Theta)$ as a function of parameters $\Theta$.
+
+
+
+# Advice for applying machine learning
+
+## Deciding what to do next
+
+How to debug a learning algorithm?
+
+* Get more training examples
+* Try smaller sets of features
+* Try getting additional features
+* Try adding polynomial features ($x_1^2, x_2^2, x_1x_2...$)
+* Try decreasing $\lambda$
+* Try increasing $\lambda$
+
+**Machine learning diagnostic:**
+
+Diagnostic: A test that you can run to gain insight what is / is not working with a learning algorithm, and gain guidances as to how best to improve its performance.
+
+Diagnostics can take time to implement, but doing so can ve a very good use of your time.
+
+## Evaluating a hypothesis
+
+**Ramdomly** choose 70% as training data: $(x^{(1)}, y^{(1)}), ..., (x^{(m)}, y^{(m)})$
+
+left 30% data as testing data: $(x^{(1)}_{test}, y^{(1)}_{test}), ..., (x^{(m_{test})}_{test}, y^{(m_{test})}_{test})$, here, $m_{test}=$ No. of test example
+
+**Training/testing procedure for linear regression:**
+
+* Learn parameter $\theta$ from training data (minimizing training error $J(\theta)$)
+* Compute test set error: $J_{test}(\theta) = \frac{1}{2m_{test}}\sum_{i=1}^{m_{test}}(h_{\theta}(x_{test}^{(i)}-y_{test}^{(i)})^2$
+
+**Training/testing procedure for logistic regression:**
+
+* Learn parameter $\theta$ from training data (minimizing training error $J(\theta)$)
+* Compute test set error: $J_{test}(\theta) = -\frac{1}{m_{test}}\sum_{i=1}^{m_{test}}[y_{test}^{(i)}log(h_{\theta}(x_{test}^{(i)}))+(1-y_{test})^{(i)}log(1-h_{\theta}(x_{test}^{(i)}))]$
+* misclassification error (0/1 misclassification):
+  * $err(h_\theta(x), y)= \begin{cases}
+    1,\quad &if\ h_\theta(x) \geq 0.5\ and \ y =0, or\ if\ h_\theta(x)<0.5 \ and \ y=1 \\
+    0,\quad &otherwise
+    \end{cases}$
+  * $Test_{error} = \frac{1}{m_{test}}\sum_{i=1}^{m_{test}}err(h_{\theta}(x_{test}^{(i)}),y_{test}^{(i)})$
+
+
+
+## Model selection and training/validation/test sets
+
+**Overfitting example**:
+
+![image-20220601104900632](machine_learning_WUENDA.assets/image-20220601104900632.png)
+
+Once parameters $\theta_0, ..., \theta_4$ were to fit some set of data (training set), the error of the parameters as measured on that data (the training error $J(\theta)$) is likely to be lower than the actual generalizetion error.
+
+**Model selection**:
+
+$d$ = degree of polybnomial
+
+1. $h_\theta(x) = \theta_0+\theta_1x$  -> $\theta^{(1)}$ -> $J_{test}(\theta^{(1)})$
+
+2. $h_\theta(x) = \theta_0+\theta_1x+\theta_2x^2$   -> $\theta^{(2)}$ -> $J_{test}(\theta^{(2)})$
+
+3. $h_\theta(x) = \theta_0+\theta_1x+...+\theta_3x^3$   -> $\theta^{(53)}$ -> $J_{test}(\theta^{(3)})$
+
+   ....
+
+10.  $h_\theta(x) = \theta_0+\theta_1x+...+\theta_10x^10$   -> $\theta^{(10)}$ -> $J_{test}(\theta^{(10)})$
+
+Choose the least $J_{test}$, -> choose $\theta_0+...+\theta_5x_5$
+
+* How well does the model generalize?
+  * report test set error $J_{test}(\theta^{(5)})$
+* Problem: $J_{test}(\theta^{(5)})$ is likely to be an optimistic estimate of generalization error. i.e, our extra parameter $d$ is fir to test set. (Use test set to get the optimal $d$, and use $d$ on the test set to get the performance)
+
+**Evaluating hypothesis**:
+
+* Training set - 60%
+  *  $(x^{(1)}, y^{(1)}), ..., (x^{(m)}, y^{(m)})$
+  * Training error: $J_{train}(\theta) = \frac{1}{2m}\sum_{i=1}^{m}(h_{\theta}(x^{(i)}-y^{(i)})^2$
+* Cross-validatiion set - 20%
+  * $(x^{(1)}_{cv}, y^{(1)}_{cv}), ..., (x^{(m_cv)}_{cv}, y^{(m_{cv})}_{cv})$, here, $m_{cv}=$ No. of cross validation example
+  * Cross validation error: $J_{cv}(\theta) = \frac{1}{2m_{cv}}\sum_{i=1}^{m_{cv}}(h_{\theta}(x_{cv}^{(i)}-y_{cv}^{(i)})^2$
+* test set - 20%
+  * $(x^{(1)}_{test}, y^{(1)}_{test}), ..., (x^{(m_{test})}_{test}, y^{(m_{test})}_{test})$, here, $m_{test}=$ No. of test example
+  * Test error: $J_{test}(\theta) = \frac{1}{2m_{test}}\sum_{i=1}^{m_{test}}(h_{\theta}(x_{test}^{(i)}-y_{test}^{(i)})^2$
+
+1. $h_\theta(x) = \theta_0+\theta_1x$  -> $\theta^{(1)}$ -> $J_{cv}(\theta^{(1)})$
+
+2. $h_\theta(x) = \theta_0+\theta_1x+\theta_2x^2$   -> $\theta^{(2)}$ -> $J_{cv}(\theta^{(2)})$
+
+3. $h_\theta(x) = \theta_0+\theta_1x+...+\theta_3x^3$   -> $\theta^{(53)}$ -> $J_{cv}(\theta^{(3)})$
+
+   ....
+
+10.  $h_\theta(x) = \theta_0+\theta_1x+...+\theta_10x^10$   -> $\theta^{(10)}$ -> $J_{cv}(\theta^{(10)})$
+
+Pick $\theta_0+\theta_1x+...+\theta_4x^4$
+
+Estimate generalization error for test set $J_{test}(\theta^{(4)})$
+
+
+
+## Diagnosing bias v.s. variance
+
+bias偏差 --> underfitting
+
+variance方差 --> overfitting
+
+![image-20220601112951612](machine_learning_WUENDA.assets/image-20220601112951612.png)
+
+**Bias/variance**:
+
+Training error: $J_{train}(\theta) = \frac{1}{2m}\sum_{i=1}^{m}(h_{\theta}(x^{(i)}-y^{(i)})^2$
+
+Cross validation error: $J_{cv}(\theta) = \frac{1}{2m_{cv}}\sum_{i=1}^{m_{cv}}(h_{\theta}(x_{cv}^{(i)}-y_{cv}^{(i)})^2$
+
+Suppose your learning algorithm is performing less well than you were hoping. ($J_{cv}(\theta)$ or $J_{test}(\theta)$ is high). Is it a bias problem or a variance problem?
+
+![image-20220601113728136](machine_learning_WUENDA.assets/image-20220601113728136.png)
+
+* Bias(underfitting): 
+  * $J_{train}(\theta)$ will be high
+  * $J_{cv}(\theta) \approx J_{train}(\theta)$
+* Variance(overfitting):
+  * $J_{train}(\theta)$ will be low
+  * $J_{cv}(\theta) >> J_{train}(\theta)$
+
+
+
+## Regularization and bias/variance
+
+**Linear regression with regularization**:
+
+Model: $h_\theta(x) =\theta_0+\theta_1x+\theta_2x^2+\theta_3x^3+\theta_4x^4$
+
+$J(\theta)=\frac{1}{2m}[\sum_{i=1}^m(h_{\theta}(x^{(i)})-y^{(i)})^2+\lambda \sum_{j=1}^n\theta_j^2]$
+
+![image-20220601114335776](machine_learning_WUENDA.assets/image-20220601114335776.png)
+
+**Choosing the regularization parameter $\lambda$**
+
+ $h_\theta(x) =\theta_0+\theta_1x+\theta_2x^2+\theta_3x^3+\theta_4x^4$
+
+$J(\theta)=\frac{1}{2m}[\sum_{i=1}^m(h_{\theta}(x^{(i)})-y^{(i)})^2+\lambda \sum_{j=1}^n\theta_j^2]$
+
+$J_{train}(\theta) = \frac{1}{2m}\sum_{i=1}^{m}(h_{\theta}(x^{(i)}-y^{(i)})^2$
+
+$J_{cv}(\theta) = \frac{1}{2m_{cv}}\sum_{i=1}^{m_{cv}}(h_{\theta}(x_{cv}^{(i)}-y_{cv}^{(i)})^2$
+
+$J_{test}(\theta) = \frac{1}{2m_{test}}\sum_{i=1}^{m_{test}}(h_{\theta}(x_{test}^{(i)}-y_{test}^{(i)})^2$
+
+1. Try $\lambda = 0$ -> $min_\theta J(\theta)$ -> $\theta^{(1)}$ -> $J_{cv}(\theta^{(1)})$
+2. Try $\lambda = 0.01$ -> $min_\theta J(\theta)$ -> $\theta^{(2)}$ -> $J_{cv}(\theta^{(2)})$
+3. Try $\lambda = 0.02$ -> $min_\theta J(\theta)$ -> $\theta^{(3)}$ -> $J_{cv}(\theta^{(3)})$
+4. Try $\lambda = 0.04$ -> $min_\theta J(\theta)$ -> $\theta^{(4)}$ -> $J_{cv}(\theta^{(4)})$
+
+...
+
+12.  Try $\lambda = 10.24$ -> $min_\theta J(\theta)$ -> $\theta^{(12)}$ -> $J_{cv}(\theta^{(12)})$
+
+Pick $\theta^{(5)}$, test error: $J_{test}(\theta^{(5)})$
+
+![image-20220601115625813](machine_learning_WUENDA.assets/image-20220601115625813.png)
+
+
+
+## Learning curves
+
+![image-20220601141818600](machine_learning_WUENDA.assets/image-20220601141818600.png)
+
+![image-20220601142033952](machine_learning_WUENDA.assets/image-20220601142033952.png)
+
+If a learning algorithm is suffering from high bias, getting more training data will not (by itself) help much.
+
+![image-20220601142509418](machine_learning_WUENDA.assets/image-20220601142509418.png)
+
+If a learning algorithm is suffering from high variance, getting more training data is likely to help.
+
+## Deciding what to do next
+
+How to debug a learning algorithm?
+
+* Get more training examples -> **fix high variance**
+* Try smaller sets of features -> **fix high variance**
+* Try getting additional features -> **fix high bias**
+* Try adding polynomial features ($x_1^2, x_2^2, x_1x_2...$) -> **fix high bias**
+* Try decreasing $\lambda$  -> **fix high bias**
+* Try increasing $\lambda$ > **fix high variance**
+
+**Neural Networks and overfitting**
+
+"Small" neural network (fewer parameters, more prone to underditting) -> computationally cheaper
+
+"Large" neural network (more parameters; more prone to overfitting) -> computationally more expensive
+
+* Use regularization ($\lambda$) to address overfitting
+
+
+
+# Machine Learning System Design
+
+## Priorizing what to work on: Spam classification problem
+
+**Building a spam classifier:**
+
+Supervised learning. $x$ = features of email. $y$ = spam (1) or not spam(0).
+
+* Feature $x$: Choose 100 words indicative of spam/nor spam.
+
+* Note: In practice, take most frequently occuring $n$ words, (10000 to 50000), in training set, rather than manually picl 100 words.
+
+How to spend your time to make it have low error?
+
+* collect lots of data
+* develop sophisticated features based on email routing information (from emial head)
+* Develop sophisticated features for message body e.g. should "discount" and "discounts" be treated as the same work? 
+* Develop sophisticased algorithm to detect misspellings (e.g. med1cine, w4tches)
+
+## Error analysis
+
+**recommended approach**:
+
+* Start with a simple algorithm that you can implememt quickly. Inplement it and test it on your cross-validation data.
+* Plot learning curves to decide if more data, more features, etc. are likely to help
+* Error analysis: Manually examine the axemples (in cross validation set) that your algorithm made errors on. See if you set any systematic trend in what type of examples it is making errors on.
+
+Email example:
+
+* $m_{CV}=500$ examples in cross validation set
+* Algorirhm misclassifies 100 emails.
+* Manually examine the 100 errors, and categorize them based on:
+  * what type of email it is 
+  * What cues(features) you think would have helped the algorithm classify them correcrly.
+
+**The importance of numerical evaluation**
+
+Should discount/discounts/discounted/discounting be treated as the same word?
+
+* Can use "stemming" software (e.g. porter stemmer)
+  * Error: universe/university.
+
+Error analysis may not be helpful for deciding if this is likely to improve performance. Only solutions is to try it and see if it works.
+
+Need numerical evaluation (e.g. cross validation error) of algorithms's performance with and without stemming.
+
+## Error metrics for skewed classes
+
+**Cancer classification example**
+
+Train logistic regression model $h_\theta(x)$, ($y=1$ if cancer, $y=0$ otherwise)
+
+Find that you got 1% error on test set (99% correct diagnosis)
+
+Only 0.5% of patients have cancer -> **skewed classes**, the positive and negative examples are not equal
+
+**Precision/recall**
+
+$y=1$ in presence of rare class that we want to detect.
+
+|             | Actual 1       | Actual 0       |
+| ----------- | -------------- | -------------- |
+| Predicted 1 | True positive  | False positive |
+| Predicted 0 | false negative | True negative  |
+
+**Precision**: (of all patients where we predicted $y=1$, what fraction actually have cancer?)
+
+$Precision = \frac{True\ positives}{True\ positives + False\ positives}$
+
+**Recall**: (of all the patients that actually have cancer, what fraction did we correctly detect as having cancer?)
+
+$Recall = \frac{True\ positives}{True\ positive+False\ negatives}$
+
+## Trading off precision and recall
+
+Logistic regression: $0 \leq h_\theta(x) \leq 1$
+
+* predict 1 if $h_\theta(x) \geq threshold$
+* predict 1 if $h_\theta(x) < threshold$
+
+Suppose we want to predict $y=1$ only if very confident ($threshold = 0.7$) -> High precision, low recall
+
+Suppose we want to avoid missing too many cases of cancer (avoid false negatives) ($threshold = 0.3$) -> High recall, low precision.
+
+**F1 score (F score)**
+
+How to compare precision/recall numbers?
+
+$F1 = 2\frac{PR}{P+R}$
+
+
+
+## data for machine learning
+
+**Large data rationale**
+
+* Use a learning algorithm with many parameters (e.g. logistic regression/linear regression with many features; nueral network with many hidden units) 
+  * low bias algorithms
+  * $J_{train}(\Theta)$ will be small.
+* Use a very large training set (unlikely to overfit)
+  * $J_{train}(\Theta) \approx J_{test}(\Theta)$
+  * With the above condition, $J_{test}(\Theta)$ will be small.
+
+
+

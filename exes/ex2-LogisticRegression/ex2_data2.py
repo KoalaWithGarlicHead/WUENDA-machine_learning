@@ -205,4 +205,5 @@ def sk_learn():
     # accuracy与model.score一样
 
 # standardized()
-sk_learn()
+# sk_learn()
+my()
