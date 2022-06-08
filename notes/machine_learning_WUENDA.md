@@ -1256,3 +1256,205 @@ $F1 = 2\frac{PR}{P+R}$
 
 
 
+# Support Vector Machines
+
+## Optimization objective
+
+**Alternative view of logistic regression**
+
+Cost of example: for a single $(x, y)$: $-ylog\frac{1}{1+e^{-\theta^Tx}}-(1-y)log(1-\frac{1}{1+e^{-\theta^Tx}})$
+
+* if $y=1$ (want $\theta^Tx >>0$):
+  * <img src="machine_learning_WUENDA.assets/image-20220605182433886.png" alt="image-20220605182433886" style="zoom:50%;" />
+  * $z = \theta^Tx, cost_1(z)$
+* if $y=0$ (want $\theta^Tx<<0$):
+  * <img src="machine_learning_WUENDA.assets/image-20220605182601624.png" alt="image-20220605182601624" style="zoom:50%;" />
+  * $cost_0(z)$
+
+**Support vector machine:**
+
+$min_\theta[\sum_{i=1}^my^{(i)}cost_1(\theta^Tx^{(i)})+(1-y^{(i)})cost_0(\theta^Tx^{(i)})]+\frac{\lambda}{2}\sum_{j=1}^n\theta_j^2$
+
+* $min_\theta[\sum_{i=1}^my^{(i)}cost_1(\theta^Tx^{(i)})+(1-y^{(i)})cost_0(\theta^Tx^{(i)})]=A$
+* $\frac{1}{2}\sum_{j=1}^n\theta_j^2 = B$
+* The trade of between $A$ and $B$:
+  * $A+\lambda B$
+  * $CA+B\ (C \approx \frac{1}{\lambda})$
+
+Finally:
+
+$min_\theta C[\sum_{i=1}^my^{(i)}cost_1(\theta^Tx^{(i)})+(1-y^{(i)})cost_0(\theta^Tx^{(i)})]+\frac{1}{2}\sum_{j=1}^n\theta_j^2$
+
+hypothesis:
+
+$h_\theta(x)= \begin{cases}1,\quad &if\ \theta^Tx \geq 0 \\
+0,\quad &otherwise
+\end{cases}$
+
+
+
+## Large Margin Intuition
+
+if $y=1$, we want $\theta^Tx\geq 1$ (not just $\geq 0$)
+
+if $y=0$, we want $\theta^Tx<-1$ (Not just $<0$)
+
+<img src="machine_learning_WUENDA.assets/image-20220606143801046.png" alt="image-20220606143801046" style="zoom:50%;" />
+
+**SVM Decision Boundary:**
+
+Whenever $y^{(i)}=1$: $\theta^Tx \geq 1$
+
+Whenever $y^{(i)}=0$: $\theta^Tx<-1$
+
+SVM are called **large margin classifier**:
+
+<img src="machine_learning_WUENDA.assets/image-20220606144357357.png" alt="image-20220606144357357" style="zoom:50%;" />
+
+When C is not very large, can ignore the outliers.
+
+
+
+## The mathematics behind the large margin classifier
+
+**Vector inner product**: 
+
+$u = [u_1, u_2]^T, v = [v_1, v_2]^T$
+
+$u^Tv = u_1v_1+u_2v_2$
+
+$||u||$ = length of vector $u$ = $\sqrt{u_1^2+u_2^2}\in R$
+
+$p\in R$: the length of projection of $v$ onto $u$. $u^Tv = v^Tu = p*||u||$
+
+<img src="machine_learning_WUENDA.assets/image-20220606145651970.png" alt="image-20220606145651970" style="zoom:50%;" />
+
+$p<0$:
+
+<img src="machine_learning_WUENDA.assets/image-20220606145852012.png" alt="image-20220606145852012" style="zoom:50%;" />
+
+**SVM Decision Boundary**:
+
+$min_\theta\frac{1}{2}\sum_{j=1}^{n}\theta_j^2$
+
+if $\theta_0 = 0, n=2$: $\frac{1}{2}\sum_{j=1}^{n}\theta_j^2 = \frac{1}{2}(\theta_1^2+\theta_2^2)=\frac{1}{2}(\sqrt{\theta_1^2+\theta_2^2})^2=\frac{1}{2}||\theta||^2$  
+
+$\theta^Tx^{(i)} = p^{(i)}||\theta|| = \theta_1x_1^{(i)}+\theta_2x_2^{(i)}$
+
+<img src="machine_learning_WUENDA.assets/image-20220606150606532.png" alt="image-20220606150606532" style="zoom:50%;" />
+
+s.t. 
+
+* $p^{(i)}\cdot||\theta|| \geq 1$. if $y^{(i)} = 1$
+* $p^{(i)}\cdot||\theta|| \leq -1$. if $y^{(i)} = 0$
+
+where $p^{(i)}$ is the projection of $x^{(i)}$ onto the vector $\theta$.
+
+![image-20220606151459368](machine_learning_WUENDA.assets/image-20220606151459368.png)
+
+Blue line: $\theta$; green line: decision boundary **他俩是垂直的**
+
+In the left graph: $p^{(1)}, p^{(2)}$ very small -> $||\theta||$ very largr -> contradict $min_\theta\frac{1}{2}||\theta||^2$
+
+So, in the rght graph, we find a decision boundary making $p^{(1)}, p^{(2)}$ not very small --> **This is how SVM can do large margin classifier**.
+
+
+
+## Kernel function
+
+![image-20220606162652071](machine_learning_WUENDA.assets/image-20220606162652071.png)
+
+Given $x$, compute new feature depending on proximity to landmarks $l^{(1)}, l^{(2)}, l^{(3)}$
+
+$f_1 = similarity(x, l^{(1)})=exp(-\frac{||x-l^{(1)||^2}}{2\sigma^2})$
+
+$f_2 = similarity(x, l^{(2)})=exp(-\frac{||x-l^{(2)||^2}}{2\sigma^2})$
+
+$f_3 = similarity(x, l^{(3)})=exp(-\frac{||x-l^{(3)||^2}}{2\sigma^2})$
+
+$similarity$: Guassin Kernel
+
+$f_1 = similarity(x, l^{(1)})=exp(-\frac{||x-l^{(1)||^2}}{2\delta^2}) = exp(\frac{\sum_{j=1}^n(x_j-l_j^{(1)})^2}{2\sigma^2})$
+
+* if $x \approx l^{(1)}$:
+  * $f_1 \approx 1$
+* if $x$ is far from $l^{(1)}$:
+  * $f_1 \approx 0$
+
+<img src="machine_learning_WUENDA.assets/image-20220606163404366.png" alt="image-20220606163404366" style="zoom:50%;" />
+
+Predict "1" when $\theta_0+\theta_1f_1+\theta_2f_2+\theta_3f_3\geq0$
+
+<img src="machine_learning_WUENDA.assets/image-20220606163826804.png" alt="image-20220606163826804" style="zoom:50%;" />
+
+In the boundary, predict $y=1$, otherwise predict $y=0$
+
+Where to get $l^{(1)}, l^{(2)}, l^{(3)}...$?
+
+* Given $(x^{(1)}, y^{(1)}), ..., (x^{(m)}, y^{(m)})$
+  * Choose $l^{(1)} = x^{(1)}, ..., l^{(m)} = x^{(m)}$
+  * Given example $x$:
+    * $f_1 = similarity(x, l^{(1)})$
+    * $f_2 = similarity(x, l^{(2)})$
+    * ...
+  * For training example $(x^{(i)}, y^{(i)})$:
+    * $f_1^{(i)} = similarity(x^{(i)}, l^{(1)})$
+    * $f_2^{(i)} = similarity(x^{(i)}, l^{(2)})$
+    * ...
+    * $f_i^{(i)} = similarity(x^{(i)}, l^{(i)})=1$
+    * ...
+    * $f_m^{(i)} = similarity(x^{(i)}, l^{(m)})$
+    * With $f_0^{(i)} = 1, f^{(i)} = [f_1^{(i)}, ..., f_m^{(i)}]^T\in R^{m+1}$
+    * $\theta \in R^{m+1}$, predict $y=1$ if $\theta^Tf \geq 0$
+    * Training: $min_\theta C[\sum_{i=1}^my^{(i)}cost_1(\theta^Tf^{(i)})+(1-y^{(i)})cost_0(\theta^Tf^{(i)})]+\frac{1}{2}\sum_{j=1}^m\theta_j^2$
+
+**SVM parameters**:
+
+$C = \frac{1}{\lambda}$ 
+
+* Large $C$: lower bias, high variance (small $\lambda$)
+* Small $C$: higher bias, low variance (large $\lambda$)
+
+$\sigma^2$: 
+
+* Large $\sigma^2$: Feature $f_i$ vary more smoothly. Higher bias, lower variance.
+* Small $\sigma^2$: Feature $f_i$, vary less smoothly. Lower bias, higher variance.
+
+
+
+## Use SVM
+
+use SVM software package to solbe for parameters $\theta$.
+
+Need to specify:
+
+* Choice of parameter $C$.
+* Choice of kernel (similarity function).
+  * No kernel ("linear kernel")
+    * Predict $y=1$ if $\theta^Tx \geq 0$
+  * Gaussian Kenel
+    * $f_i = exp(-\frac{||x-l^{(i)}||^2}{2\sigma^2})$, where $l^{(i)}=x^{(i)}$
+    * Need to choose $\sigma^2$
+    * Do perform feature scaling before using the Gaussian kernel.
+  * Other choices of kernel
+    * Note: Not all similariity functions $similarity(x,l)$ make valid kernels. (Need to satiisfy technical condition called *Mercer's Theorem* to make sure SVM packages' optimizations run correctly, and do not diverge)
+    * Many off-the-shelf kernels available:
+      * Polynominal kernel: $k(x, l) = (x^Tl)^2/(x^Tl)^3/(x^Tl+5)^4/.../(x^Tl+constant)^{degree}$
+      * More esoteric: String kernel, chi-square kernel, histogram kernel, intersection kernel, ...
+
+**Multi-class classification**:
+
+Many SVM packages already have built-in multi-class classification functionality. Otherwise, use one-vs-all method. (Train $K$ SVMs, ont to distinguish $y=i$ from the rest, for $i = 1,2,...,K$, get $\theta^{(1)}, \theta^{(2)}, ..., \theta^{(k)}$, pick class $i$ with largest $(\theta^{(i)})^Tx$)
+
+**Logistic regression vs. SVMs**
+
+$n$ = number of features ($x \in R^{n+1}$), $m$ = number of training examples
+
+* if $n$ is large (relative to $m$):
+  * Use logistic regression, or SVM without a kernel ("linear kernel")
+* if $n$ is small, $m$ is intermediate:
+  * Use SVM with Gaussian kernel
+* if $n$ is small, $m$ is large:
+  * create/add more fratures, then use logistic regression, or SVM without a kernel ("linear kernel")
+
+Neural network likely to work well for most of these settings, but may be slower to train.
