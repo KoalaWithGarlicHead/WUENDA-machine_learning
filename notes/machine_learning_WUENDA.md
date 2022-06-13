@@ -1458,3 +1458,782 @@ $n$ = number of features ($x \in R^{n+1}$), $m$ = number of training examples
   * create/add more fratures, then use logistic regression, or SVM without a kernel ("linear kernel")
 
 Neural network likely to work well for most of these settings, but may be slower to train.
+
+
+
+# Clustering
+
+## Unsuprvised learning
+
+Training set: $\{x^{(1)}, ..., x^{(m)}\}$
+
+## K-means
+
+Input:
+
+* $K$ (number of clusters)
+* Training set \{x^{(1)}, ..., x^{(m)}\}$
+
+$x^{(i)}\in R^n$ (drop $x_0=1$ convention)
+
+**K-means algorithm**
+
+Ramdomly initialize $k$ cluster centroids $u_1, u_2, ..., u_K \in R^n$
+
+Repeat {
+
+​    for $i$ = 1 to $m$: (*cluster assaignment step*)
+
+​         $c^{(i)}$:= index (from 1 to $K$ of cluster centroid) colest to $x^{(i)}$
+
+​        (*minimize $J$ with $u$ fixed*)
+
+​    for $k$ = 1 to $K$: (*move centroid*)
+
+​         $u_k$ := average (mean) of points assigned to cluster $k$
+
+​           (*minimize $J$ with $c$ fixed*)
+
+}
+
+## optimization objective
+
+* $c^{(i)}$ = index of cluster ($1,2,...,K$) to which example $x^{i}$ is currentlt assigned
+* $u_k$ = cluster centroid $k$ ($u_k \in R^n$)
+* $u_{c^{(i)}}$ = cluster centroid of cluster to which example $x^{(i)}$ has been assigned.
+
+Optimization objective:
+
+$J(c^{(1)}, ..., c^{(m)}, u_1, ..., u_k) = \frac{1}{m}\sum_{i=1}^m||x^{(i)}-u_{c^{(i)}}||^2$
+
+$min_{c^{(1)}, ..., c^{(m)}, u_1, ..., u_k}J(c^{(1)}, ..., c^{(m)}, u_1, ..., u_k)$
+
+## Ramdom Initialization
+
+should have $K<m$
+
+Ramdomly pick $K$ training examples
+
+set $u_1, ..., u_k$ equal to these $K$ examples.
+
+for $i$ = 1 t 100 {
+
+​    Ramdomly initialize K-means
+
+​    Run K-means. Get $c^{(1)}, ..., c^{(m)}, u_1, ..., u_k$
+
+​    compute cose function (dictortion) $J(c^{(1)}, ..., c^{(m)}, u_1, ..., u_k)$
+
+}
+
+Pick clustering that gave lowest cost $J(c^{(1)}, ..., c^{(m)}, u_1, ..., u_k)$
+
+## Choosing the number of clusters
+
+Elbow method
+
+![image-20220611124820827](machine_learning_WUENDA.assets/image-20220611124820827.png)
+
+Sometimes, you are running K-means to get clusters to use for some later/downstream purpose.Evaluate K-means based on a metric for how well it performs for that later purpose.
+
+![image-20220611125023939](machine_learning_WUENDA.assets/image-20220611125023939.png)
+
+
+
+# Dimensionality Reduction
+
+## Motivation 1: Data Compression
+
+Reduce data from 2D to 1D
+
+<img src="machine_learning_WUENDA.assets/image-20220611125720208.png" alt="image-20220611125720208" style="zoom:50%;" />
+
+* $x^{(1)} \in R^2 \rightarrow z^{(1)} \in R$
+* $x^{(2)} \in R^2 \rightarrow z^{(2)} \in R$
+* ...
+* $x^{(m)} \in R^2 \rightarrow z^{(m)} \in R$
+
+Reduce data from 3D to 2D: projection on the plane
+
+<img src="machine_learning_WUENDA.assets/image-20220611130010955.png" alt="image-20220611130010955" style="zoom:50%;" />
+
+
+
+## Motivation 2: Data Visualization
+
+Reduce data from 50D to 2D
+
+
+
+## Principle Component Analysis Problm Formulation
+
+Reduce from 2-Dimension to 1-Dimension: find a direction (a vector $u^{(1)}\in R^n$) onto whch to project the sata so as to minimize the projection error.
+
+Reduce from $n$-Dimension to $k$-Dimension: find $k$ vectors $u^{(1)}, u^{(2)}, ..., u^{(k)}$ onto whch to project the sata so as to minimize the projection error.
+
+**PCA is not linear regression**
+
+linear regression
+
+* vertical distance
+* Use $x$ To predict $y$
+
+PCA
+
+* shortest orthogonal distance
+* no $y$
+
+<img src="machine_learning_WUENDA.assets/image-20220611142833526.png" alt="image-20220611142833526" style="zoom:50%;" />
+
+**Data preprocessing**
+
+Training set: $x^{(1)}, x^{(2)}, ..., x^{(n)}$
+
+Preprocessing (feature scaling/mean normalization):
+
+​    $u_j = \frac{1}{m}\sum_{i=1}^mx_j^{(i)}$
+
+​    replace each $x_j^{(i)}$ with $x_j-u_j$
+
+​    if different features on different scales (e.g. $x_1$ = size of house, $x_2$ = number of bedrooms), **scale features** to have comparable range of values.
+
+**PCA algorithm**
+
+Reduce data from $n$-dimensions to $k$-dimenstion
+
+Compute "convariance matrix": $\Sigma = \frac{1}{m}\sum_{i=1}^n(x^{(i)})(x^{(i)})^T $, $n \times n$ Matrix
+
+Compute "eigenvectors" of matrix $\Sigma$: 	`[U,S,V] = svd(sigma)` *(svd: sigular value decomposition)*
+
+* `U`: $n \times n$ matrix 
+
+  <img src="machine_learning_WUENDA.assets/image-20220611144335603.png" alt="image-20220611144335603" style="zoom:50%;" />
+
+$x \in R^n \rightarrow z \in R^k$: get the first $k$ vectors in $U$
+
+$z = [u^{(1)}, u^{(2), ...,} u^{(k)}]^Tx$
+
+* $[u^{(1)}, u^{(2), ...,} u^{(k)}]^T$: $k \times n$ matrix
+* $x$: $n\times 1$ matrix
+* $z$: $k\times 1$ matrix
+
+**Priciple Component Analysis (PCA) algorithm summary**
+
+* After mean normalization (ensure every feature has zero mean) and optionally feature scaling
+* $\Sigma = \frac{1}{m}\sum_{i=1}^n(x^{(i)})(x^{(i)})^T $
+* `[U,S,V]=svd(sigma)`
+* `Ureduce = U(:,1:k)`
+* `z = Ureduce.T*x`
+
+## Choosing the number of pricipal components
+
+**Chossing $k$ (number of pricipal components)**
+
+Average squared projection error: $\frac{1}{m}\sum_{i=1}^m||x^{(i)}-x_{approx}^{(i)}||^2$
+
+Total variation in data: $$\frac{1}{m}\sum_{i=1}^m||x^{(i)}||^2$$
+
+Typocally choose $k$ to be the smallest value so that:
+
+$\frac{\frac{1}{m}\sum_{i=1}^m||x^{(i)}-x_{approx}^{(i)}||^2}{\frac{1}{m}\sum_{i=1}^m||x^{(i)}||^2} \leq 0.01$
+
+* "99% of variance is retained"
+  * e.g. $\leq 0.05$ means "85% of variance is retained"
+  * the value for most dataset is 95%-99%
+
+Algorithm:
+
+* Try PCA with $k=1$
+* Compute $U_{reduce}, z^{(1)}, ..., z^{(m)}, x_{approx}^{1}, ..., x^{(m)}_{approx}$
+* Check if $\frac{\frac{1}{m}\sum_{i=1}^m||x^{(i)}-x_{approx}^{(i)}||^2}{\frac{1}{m}\sum_{i=1}^m||x^{(i)}||^2} \leq 0.01$
+* then try $k=2, k=3, k=4...$
+
+or, `[U, S, V] = svd(sigma)`
+
+$S = \begin{bmatrix}S_{11}&0&...&0\\0&S_{22}&...&0\\...\\0&0&...&s_{nn}\end{bmatrix}$
+
+for given =$k$, $\frac{\frac{1}{m}\sum_{i=1}^m||x^{(i)}-x_{approx}^{(i)}||^2}{\frac{1}{m}\sum_{i=1}^m||x^{(i)}||^2} \leq 0.01$ is :
+
+$1-\frac{\sum_{i=1}^kS_{ii}}{\sum_{i=1}^nS_{ii}}\leq 0.01$, which equals: $\frac{\sum_{i=1}^kS_{ii}}{\sum_{i=1}^nS_{ii}}\geq 0.99$
+
+then pick the smalltest value of k for which $\frac{\sum_{i=1}^kS_{ii}}{\sum_{i=1}^nS_{ii}}$, (99% of variance retained)
+
+
+
+
+
+## Restruction from compressed representation
+
+$z = U_{reduce}^Tx$
+
+$X_{approx} = U_{reduce}z$ ($n \times 1 = (n \times k) * (k\times 1)$)
+
+<img src="machine_learning_WUENDA.assets/image-20220611151255547.png" alt="image-20220611151255547" style="zoom:50%;" />
+
+
+
+## Advice for applying PCA
+
+**Supervised learning speedup**
+
+$(x^{(1)}, y^{(1)}), (x^{(2)}, y^{(2)}), ..., (x^{(m)}, y^{(m)})$
+
+Extra inputs:
+
+* Unlabeled dateset: $x^{(1)}, ..., x^{(m)} \in R^{10000}$
+* use **PCA**, get $z^{(1)}, ..., z^{(m)}\in R^{1000}$
+
+New training set: $(z^{(1)}, y^{(1)}), (z^{(2)}, y^{(2)}), ..., (z^{(m)}, y^{(m)})$
+
+Note: Mapping $x^{(i)} \rightarrow z^{(i)}$ should be defined bu unning PCA only on the training set. This mapping can be applied as well to the examples $x_{cv}^{(i)}$ and $x_{test}^{(i)}$ in the cross validation and test set.
+
+**Application of PCA**
+
+* Compression
+  * reduce memory/disk needed to store data
+  * speed up learning algorithm
+* visualization ($k=2$ or $k=3$)
+
+**Bad use of PCA: To prevent overfitting**
+
+Use $z^{(i)}$ instead of $x^{(i)}$ to reduce the number of featuures to $k<n$.
+
+Thus, fewer features, less likely to overfit.
+
+This might work OK, but is not a good way to address overfitting. **Use regularization instead.**
+
+![image-20220611152618555](machine_learning_WUENDA.assets/image-20220611152618555.png)
+
+
+
+# Anomaly detection
+
+## Problem motivation
+
+**Anomqly detection example**:
+
+Aircraft engine features:
+
+* $x_1$: heat generated
+* $x_2$: vibration intensity
+
+Dataset: $\{x^{(1)}, ..., x^{(m)}\}$
+
+New engine: $x_{test}$. Is $x_{test}$ anomalous?
+
+Model: $p(x)$, if $p(x_{test}) < \epsilon$ --> anomaly
+
+Fraud detection:
+
+* $x^{(i)}$ = features of user $i$'s activities
+* Model $p(x)$ from data
+* Identify unusual users by checking which have $p(x)<\epsilon$
+
+Manufaturing
+
+Monitoring computes ina data center:
+
+* $x^{(i)}$ = features od machine $i$
+* $x_1$ = memory use, $x_2$ = number of disk accesses/sec, $x_3$ = CPU load...
+
+
+
+## Gaussian Distribution
+
+Gaussian distribution is also called Normal Distribution
+
+**Gaussian (Normal) distribution**
+
+Say $x\in R$, if $x$ is a distributes Guassian with mean $\mu$, variance $\sigma^2$ ($\sigma$: standard deviation)
+
+Then, $x \sim N(\mu, \sigma^2)$ ($\sim$: distributed as)
+
+$p(x; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x-\mu)^2}{2\sigma^2}}$
+
+![image-20220611190651183](machine_learning_WUENDA.assets/image-20220611190651183.png)
+
+**Parameter estimation**
+
+Dataset: $\{x^{(1)}, ..., x^{(m)}\}, x^{(i)}\in R$
+
+$\mu = \frac{1}{m}\sum_{i=1}^mx^{(i)}$
+
+$\sigma^2 = \frac{1}{m}\sum_{i=1}^m(x^{(i)}-\mu)^2$
+
+
+
+## Algorithm
+
+**Density estimation**
+
+tarining set: $\{x^{(1)}, ..., x^{(m)}\}, x^{(i)}\in R^n$
+
+$x_1 \sim N(\mu_1, \sigma_1^2), x_2 \sim N(\mu_2, \sigma_2^2), ...$
+
+$p(x) = p(x_1; \mu_1, \sigma^2_1)p(x_2;\mu_2, \sigma_2^2)...p(x_n;\mu_n, \sigma_n^2)=\prod_{j=1}^np(x_j;\mu_j,\sigma_j^2)$
+
+**Anomoly Detection Algorithm**
+
+* choose features $x_i$ that youthink might be indicative of anomalous examples
+* fit parameters $\mu_1, ..., \mu_n, \sigma_1^2, ..., \sigma_n^2$
+  * $\mu_j = \frac{1}{m}\sum_{i=1}^mx_j^{(i)}$ ($\mu = [\mu_1, ..., \mu_n]^T = \frac{1}{m}\sum_{i=1}^mx^{(i)}$)
+  * $\sigma_j^2 = \frac{1}{m}\sum_{i=1}^m(x_j^{(i)}-\mu_j)^2$
+* Given new example $x$ Compute $p(x)$:
+  * $p(x) = \prod_{j=1}^np(x_j;\mu_j,\sigma_j^2)=\prod_{j=1}^n\frac{1}{\sqrt{2\pi}\sigma_j}e^{-\frac{(x-\mu_j)^2}{2\sigma_j^2}}$
+  * Anomoly if $p(x) < \epsilon$
+
+## Developing and evaluating an anomoly detection system
+
+**The importance of real-number evaluation**
+
+When developing a learning algorithm (choosing features, etc), makeing decisions is much easier if we have a way of evaluating our learning algorithm
+
+Assume we have some labeled data, of anomalous and non-anomalous examples. ($y=0$ if normal, $y=1$ if anomalous)
+
+Training set: $x^{(1)}, ..., x^{(m)}$ (assume normal examples / not anomalous)
+
+Cross validation set: $(x_{cv}^{(1)}, y_{cv}^{(1)}),...,(x_{cv}^{(m_{cv})}, y_{cv}^{(m_{cv})})$
+
+test set: $(x_{test}^{(1)}, y_{test}^{(1)}),...,(x_{test}^{(m_{test})}, y_{test}^{(m_{test})})$
+
+**Aircraft egines motivating example**
+
+* 10000 good(normal) engines
+* 20 flawed engines (anomalous)
+
+Data split:
+
+* Training set: 6000 good engines ($y=0$)
+* CV: 2000 good engines ($y=0$), 10 anomalous ($y=1$)
+* Test: 2000 good engines ($y=0$), 10 anomalous ($y=1$)
+
+**Algorithm evaluation**
+
+Fit model $p(x)$ on training set  $x^{(1)}, ..., x^{(m)}$ 
+
+On a cv/test example $x$ Predict: 
+
+* $y = 1$ if $p(x)<\epsilon$ (anomaly)
+* $y=0$ if $p(x)\geq \epsilon$ (normal)
+
+Possible evaluation metrics:
+
+* True positives, false positives, trrue negative, false negative
+* precision/recall
+* f1-score
+
+Can also use cross validation set to choose parameter $\epsilon$
+
+## Anomaly detection vs. Supervised learning
+
+Anomoly detection:
+
+* very small numbr of positive examples ($y=1$) (0-20 is common)
+* Large numbr of negative examples ($y=0$)
+* many different "types" of anomolies. Hard for any algorithm to learn fom positive examples what the anomalies look like; future anomalies may look nothing like any of the anomalous examples we have sen so far 
+
+Supervised learning
+
+* Large number of positive and negative examples
+* Enough positive examples for algorithm to get a sense of what positive examples are like, future positivee examples are likely to be similar to ones in training set.
+
+
+
+## choosing what features to use
+
+**Non-gaussian features**
+
+<img src="machine_learning_WUENDA.assets/image-20220611233014402.png" alt="image-20220611233014402" style="zoom:50%;" />
+
+**Error analysis for anomoly detection**
+
+want $p(x)$ large for normal examples $x$, $p(x)$ small for anomalous examples $x$
+
+Most common problem: $p(x)$ is a comparable (say, both large) for normal and anomalous examples.
+
+<img src="machine_learning_WUENDA.assets/image-20220611233836696.png" alt="image-20220611233836696" style="zoom:50%;" />
+
+**Monitoring comouters in a data center**
+
+Choose features that might take on unusually large or small values in the event of an anomaly.
+
+* $x_1$: memory use of computer
+* $x_2$: number of disk accesses/sec
+* $x_3$: CPU load
+* $x_4$: network traffic
+
+for example, when stuck in a job, only high CPU load but normal network traffic, in this situation can create a new feature $x_6$ = CPU load/network traffic
+
+## Multivariate Gaussian (Normal) Distribution
+
+$x \in R^n$. Do not model $p(x_1), p(x_2), ...$ separately.
+
+Model $p(x)$ all in one go.
+
+Parameters: $\mu \in R^n$, $\Sigma \in R^{n\times n}$ (Covariance matrix)
+
+$p(x; \mu, \Sigma) = \frac{1}{(2\pi^{\frac{n}{2}})|\Sigma|^{\frac{1}{2}}}e^{-\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu)}$
+
+![image-20220611235333104](machine_learning_WUENDA.assets/image-20220611235333104.png)
+
+![image-20220611235414813](machine_learning_WUENDA.assets/image-20220611235414813.png)
+
+![image-20220611235559284](machine_learning_WUENDA.assets/image-20220611235559284.png)
+
+![image-20220611235743877](machine_learning_WUENDA.assets/image-20220611235743877.png)
+
+## Anomoly detection using the multivariate Gaussian distribution
+
+Parameters $\mu, \Sigma$
+
+$p(x; \mu, \Sigma) = \frac{1}{(2\pi^{\frac{n}{2}})|\Sigma|^{\frac{1}{2}}}e^{-\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu)}$
+
+Parameter fitting: 
+
+Given training set $\{x^{(1)}, ... x^{(m)}\}$
+
+$\mu = \frac{1}{m}\sum_{i=1}^mx^{(i)}$, $\Sigma = \frac{1}{m}\sum_{i=1}^m(x^{(i)}-\mu)(x^{(i)}-\mu)^T$
+
+1. Fit mdel $p(x)$ by setting $\mu, \Sigma$
+2. Given a new example $x$, compute $p(x)$, find an anomaly if $p(x)<\epsilon$
+
+**Relationship to original model**
+
+Original model: $p(x) = \prod_{j=1}^np(x_j;\mu_j,\sigma_j^2)$
+
+* This model corresponds to a special case of multivariate Gaussian distribution
+* Axis-aligned with x1 and x2 axis (没有旋转, x1轴与x2轴横平竖直)
+* corresponds to multivariate Gaussian when: $\Sigma = \begin{bmatrix}\sigma_1^2&0&...&0\\0&\sigma_2^2&...&0\\...\\0&0&...&\sigma_n^2\end{bmatrix}$
+
+* Manually create features to capture anomalies where $x_1, x_2$ take unusual combinations of values
+* (alternatively, scales better to large $n$)
+* OK even if $m$ (training set size) is small
+
+Multivariate Gaussian
+
+* Automaticaaly captures correlations between features
+* Computationally more expensive
+
+* Must have $m>n$, or else $\Sigma$ is non-invertible (better when $m \geq 10n$)
+
+
+
+# Recommendor Systems
+
+## Problem formulation
+
+**Example: Predicting movie ratings**
+
+User rates movies using 0 to 5 stars.
+
+<img src="machine_learning_WUENDA.assets/image-20220612002749749.png" alt="image-20220612002749749" style="zoom:50%;" />
+
+* $n_u$: no. of users
+* $n_m$: no. of movies
+* $r(i,j)=1$ if uder $j$ has rated movie $i$
+* $y^{(i,j)}$ = rating given by user $j$ to movie $i$ (defined only if $r(i,j)=1$)
+
+## Content-based recommendations
+
+How to predict missing valus above?
+
+$x_1$: a movie is a romance movie
+
+$x_2$: a movie is an action movie
+
+<img src="machine_learning_WUENDA.assets/image-20220612002852365.png" alt="image-20220612002852365" style="zoom:50%;" />
+
+with $x_0=1$, then get first movie: $x^{(1)} = [1, 0.9, 0]^T$
+
+For each user $j$, learn a parameter $\theta^{(j)}\in R^3$. Predict user $j$ as rating movie $i$ with $(\theta^{(j)})^Tx^{(i)}$ stars.
+
+* e.g. $\theta^{(1)} = [0, 5, 0]^T$, then for Movie 3(Cute puppies of love) with $x^{(3)} = [1, 0.99, 0]^T$, the star would be 4.95
+
+**Problem formulation**
+
+* $r(i,j)=1$ if uder $j$ has rated movie $i$ (0 otherwise)
+* $y^{(i,j)}$ = rating given by user $j$ to movie $i$ (defined only if $r(i,j)=1$)
+* $\theta^{(j)}$ = parameter vector for user $j$
+* $x^{(i)}$ = feature vector for movie $i$
+* For user $j$, movie $i$, predicted rating: $(\theta^{(j)})^Tx^{(i)}$
+* $m^{(j)}$ = no. of movies rated by user $j$
+* To learn $\theta^{(j)}$: $min_{\theta^{(j)}}\frac{1}{2m^{(j)}}\sum_{i: r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2m^{(j)}}\sum_{k=1}^n(\theta_k^{(j)})^2$
+  * take $\frac{1}{2m^{(j)}}$ as a constant
+
+**Optimization objective**:
+
+To learn $\theta^{(j)}$ (parameter for user $j$): $min_{\theta^{(j)}}\frac{1}{2}\sum_{i: r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2}\sum_{k=1}^n(\theta_k^{(j)})^2$
+
+To learn $\theta^{(1)}, ..., \theta^{(n_u)}$:$$min_{\theta^{(1)}, ..., \theta^{(n_u)}}\frac{1}{2}\sum_{j=1}^{n_u}\sum_{i: r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2}\sum_{j=1}^{n_u}\sum_{k=1}^n(\theta_k^{(j)})^2$$
+
+**optimization algorithm**:
+
+$$J(\theta^{(1)}, ..., \theta^{(n_u)}) = min_{\theta^{(1)}, ..., \theta^{(n_u)}}\frac{1}{2}\sum_{j=1}^{n_u}\sum_{i: r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2}\sum_{j=1}^{n_u}\sum_{k=1}^n(\theta_k^{(j)})^2$$
+
+Gradient descent update:
+
+* for $k=0$: $\theta_k^{(j)}:=\theta_k^{(j)}-\alpha\sum_{i: r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})x_k^{(i)}$
+* for $k \neq 0 $: $\theta_k^{(j)}:=\theta_k^{(j)}-\alpha(\sum_{i: r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})x_k^{(i)}+\lambda\theta_k^{(j)})$
+
+
+
+## Collaborative filtering
+
+**Optimization algorithm**:
+
+Given $\theta^{(1)}, ..., \theta^{(n_u)}$, to learn $x^{(i)}$: $min_{x^{(i)}}\frac{1}{2}\sum_{j: r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2}\sum_{k=1}^nx_k^{(i)})^2$
+
+Given $\theta^{(1)}, ..., \theta^{(n_u)}$, to learn $x^{(1)}, ..., x^{(n_m)}$: $min_{x^{(1)}, ..., x^{(n_m)}}\frac{1}{2}\sum_{i=1}^{n_m}\sum_{j: r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2}\sum_{j=1}^{n_m}\sum_{k=1}^n(x_k^{(i)})^2$
+
+* **in content-based recommendations**, Given $x^{(1)}, ..., x^{(n_m)}$ (and movie ratings), can estimate $\theta^{(1)}, ..., \theta^{(n_u)}$* 
+* **here**, given $\theta^{(1)}, ..., \theta^{(n_u)}$, can estimate $x^{(1)}, ..., x^{(n_m)}$
+
+## Collaborative Filtering Algorithm
+
+Gven $x^{(1)}, ..., x^{(n_m)}$, to learn $\theta^{(1)}, ..., \theta^{(n_u)}$: $min_{\theta^{(1)}, ..., \theta^{(n_u)}}\frac{1}{2}\sum_{j=1}^{n_u}\sum_{i: r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2}\sum_{j=1}^{n_u}\sum_{k=1}^n(\theta_k^{(j)})^2$
+
+Given $\theta^{(1)}, ..., \theta^{(n_u)}$, to learn $x^{(1)}, ..., x^{(n_m)}$: $min_{x^{(1)}, ..., x^{(n_m)}}\frac{1}{2}\sum_{i=1}^{n_m}\sum_{j: r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2}\sum_{j=1}^{n_m}\sum_{k=1}^n(x_k^{(i)})^2$
+
+**Collabarative filtering optimization objective**
+
+Minimizing $x^{(1)}, ..., x^{(n_m)}$ and $\theta^{(1)}, ..., \theta^{(n_u)}$ silmultaneously:$J(x^{(1)}, ..., x^{(n_m)}, \theta^{(1)}, ..., \theta^{(n_u)}) = \frac{1}{2}\sum_{(i,j): r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})^2+\frac{\lambda}{2}\sum_{j=1}^{n_m}\sum_{k=1}^n(x_k^{(i)})^2+\frac{\lambda}{2}\sum_{j=1}^{n_u}\sum_{k=1}^n(\theta_k^{(j)})^2$
+
+$min_{x^{(1)}, ..., x^{(n_m)}, \theta^{(1)}, ..., \theta^{(n_u)}}J(x^{(1)}, ..., x^{(n_m)}, \theta^{(1)}, ..., \theta^{(n_u)})$
+
+In this situation, $x\in R^n, \theta \in R^n$ (not $\in R^{n+1}$, no need to have $x_0=1,\theta_0=1$)
+
+**Collaborative algorithm**:
+
+1. Initialize $x^{(1)}, ..., x^{(n_m)}, \theta^{(1)}, ..., \theta^{(n_u)}$ to small ramdom values
+2. minimize $J(x^{(1)}, ..., x^{(n_m)}, \theta^{(1)}, ..., \theta^{(n_u)})$ using gradient descent (or an advanced optimization algorithm). e,g. for every $j = 1, ..., n_u; i=1, ..., n_m$:
+   1. $x_k^{(i)} := x^{(i)}_k-\alpha(\sum_{j: r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})\theta_k^{(j)}+\lambda x_k^{(i)}))$
+   2. $\theta_k^{(j)} := \theta^{(j)}_k-\alpha(\sum_{i: r(i,j)=1}((\theta^{(j)})^Tx^{(i)}-y^{(i,j)})x_k^{(i)}+\lambda \theta_k^{(j)}))$
+3. For a user with parameter $\theta$ and a movie with (learned) features $x$, predict a start rating for $\theta^Tx$ (movie $j$, user $i$, compute $(\theta^{(j)})^T(x^{(i)})$)
+
+## Vectorization: Low rank matrix factorization
+
+<img src="machine_learning_WUENDA.assets/image-20220612105842771.png" alt="image-20220612105842771" style="zoom:50%;" />
+
+$X = [(x^{(1)})^T, ..., (x^{(n_m)})^T]^T, \Theta = [(\theta^{(1)})^T, ..., (\theta^{(n_u)})^T]^T$, then predicted ratings is $X\Theta^T$ -- **Low rank matrix factorization**
+
+**Findinng related movies**
+
+For each product $i$, we learn a feature vector $x^{(i)}\in R^n$ ($x_1$: romancce, $x_2$: action ...)
+
+How to find movies $j$ related to movie $i$? 
+
+* small $||x^{(i)}-x^{(j)}||$ -> movie $j$ and $i$ are simillar
+* 5 most similar movies to movie $i$: find the 5 movies $j$ with the smallest $||x^{(i)}-x^{(j)}||$
+
+## Implementation detail: mean normalization
+
+<img src="machine_learning_WUENDA.assets/image-20220612111427258.png" alt="image-20220612111427258" style="zoom:50%;" />
+
+Use above left new $Y$ to learn $\theta^{(j)}, x^{(i)}$
+
+For user $j$, on movie $i$ Predict: $(\theta^{(j)})^T(x^{(i)})+\mu_i$
+
+
+
+#  Large Scale Machine Learning
+
+## Learning with big datasets
+
+come up with computationally reasonable and efficient methods.
+
+## Stochastic Gradient Descent
+
+**Linear regression with gradient descent**
+
+$h_\theta(x) =\sum_{j=0}^n\theta_jx_j$
+
+$J_{train}(\theta) = \frac{1}{2m}\sum_{i=1}^m(h_\theta(x^{(i)})-y^{(i)})^2$to
+
+Repeat {
+
+​    $\theta_j := \theta_j-\alpha\frac{1}{m}\sum_{i=1}^m(h_\theta(x^{(i)})-y^{(i)})x_j^{(i)}$ for every $j = 0, ..., n$
+
+} -- **Batch Gradient Descent**
+
+**Stachastic gradient descent**
+
+$cost(\theta, (x^{(i)}, y^{(i)})) =\frac{1}{2}(h_\theta(x^{(i)})-y^{(i)})^2$
+
+$J_{train}(\theta) = \frac{1}{m}\sum_{i=1}^mcost(\theta, (x^{(i)}, y^{(i)}))$
+
+1. Ramdomly shuffle dataset
+
+2. repeat {
+
+   ​    for $i = 1, ..., m$ {
+
+   ​         $\theta_j := \theta_j-\alpha(h_\theta(x^{(i)})-y^{(i)})x_j^{(i)}$ for every $j = 0, ..., n$
+
+   ​    }
+
+   }
+
+## Mini-batch gradient descent
+
+* Batch gradient descent : Use all $m$ examples in each iteration
+* Stochasitic gradient descent: Use 1 example in each iteration
+* Mini-batch gradient descent: Use $b$ examples in each iteration
+  * $b$ = mini-batch size
+
+**Mini-batch gradient descent**
+
+Say $b=10, m=1000$
+
+Repeat {
+
+​    for $i=1,11,32,31,...,991${
+
+​         $\theta_j := \theta_j-\alpha\frac{1}{10}\sum_{k=i}^{i+9}(h_\theta(x^{(i)})-y^{(i)})x_j^{(i)}$ for every $j = 0, ..., n$
+
+​    }
+
+}
+
+## Stochastic Gradient Descent Convergence
+
+**Ckecking for convergence**
+
+Stochastic gradient descent:
+
+* $cost(\theta, (x^{(i)}, y^{(i)})) =\frac{1}{2}(h_\theta(x^{(i)})-y^{(i)})^2$
+* During learning, compute $cost(\theta, (x^{(i)}, y^{(i)}))$ before updating $\theta$ using $(x^{(i)}, y^{(i)})$
+* Every 1000 iterations(say), plot $cost(\theta, (x^{(i)}, y^{(i)}))$ averaged over the 1000 examples processed by algorithm
+
+<img src="machine_learning_WUENDA.assets/image-20220612200602606.png" alt="image-20220612200602606" style="zoom:50%;" />
+
+Learning rate $\alpha$ is typically held constant. Can slowly decrease $\alpha$ over time if we want $\theta$ to converge. (e.g. $\alpha$=`const1/(iterationNumber+const2)`
+
+## Online Learning
+
+Shipping service website where user comes, specifies origin and destination, you offer to ship their package for some asking price, and users sometimes choose to use your shipping service $(y=1)$, sometimes not$(y=0)$.
+
+Features $x$ capture properties of user, of origin/destination and asking price. We want to learn $p(y=1|x;\theta)$ to optimize price.
+
+Repeat forever {
+
+​    Get $(x, y)$ corresponding to user.
+
+​    Updateing $\theta$ using $(x,y)$: $\theta_j := \theta_j-\alpha(h_\theta(x)-y)x_j$ ($j = 0, ..., n$)
+
+} ---- **can adapt to changing user preference**
+
+**Other online learning example**:
+
+Product search (learning to search)
+
+* User searches for "Android phone 1080p camera"
+* Have 100 phones in store. Will return 10 results.
+* $x$ = features of phone, how many words in user query match name of phone, how many words in query match description of phone, etc.
+* $y=1$ if user clicks on the link, $y=0$ Otherwise.
+* Learn $p(y=1|x;\theta)$ <- **predicted CTR (Click Through Rate)**
+* Use to show user the 10 phones they are most likely to click on
+
+Other examples: Choosing special offers to show user; customized selection of new articles; product recommendation; ...
+
+
+
+## Map-reduce and data parallelism
+
+**Map-reduce**
+
+Batch gradient descent: $m=400$, $\theta_j := \alpha\frac{1}{400}\sum_{i=1}^{400}(h_\theta(x^{(i)})-y^{(i)})x_j^{(i)}$
+
+* Machine 1: Use $(x^{(1)}, y^{(1)}), ..., (x^{(100)}, y^{(100)})$
+  * $temp_j^{(1)} = \sum_{i=1}^{100}(h_\theta(x^{(i)})-y^{(i)})x_j^{(i)}$
+* Machine 2: Use $(x^{(101)}, y^{(101)}), ..., (x^{(200)}, y^{(200)})$
+  * $temp_j^{(2)} = \sum_{i=101}^{200}(h_\theta(x^{(i)})-y^{(i)})x_j^{(i)}$
+* Machine 3: Use $(x^{(201)}, y^{(201)}), ..., (x^{(300)}, y^{(300)})$
+  * $temp_j^{(3)} = \sum_{i=201}^{300}(h_\theta(x^{(i)})-y^{(i)})x_j^{(i)}$
+* Machine 4: Use $(x^{(301)}, y^{(301)}), ..., (x^{(400)}, y^{(400)})$
+  * $temp_j^{(4)} = \sum_{i=301}^{400}(h_\theta(x^{(i)})-y^{(i)})x_j^{(i)}$
+* Combine: $\theta_j := \theta_j-\alpha\frac{1}{400}(temp_j^{(1)}+temp_j^{(2)}+temp_j^{(3)}+temp_j^{(4)}), (j=0, ..., n)$
+
+<img src="machine_learning_WUENDA.assets/image-20220612203438021.png" alt="image-20220612203438021" style="zoom:50%;" />
+
+**Map-reduce and summation over the training set**
+
+Many learning algorithms can be expressed as computing sums of functions over thre trainning set.
+
+e.g. for advanced optimization, with logistic regression, need: 
+
+$J(\theta)=-\frac{1}{m}\sum_{i=1}^m[y^{(i)}log(h_\theta(x^{(i)})+(1-y^{(i)})log(1-h_\theta(x^{(i)}))]$
+
+$\frac{\partial}{\partial\theta_j}J(\theta) = \frac{1}{m}\sum_{i=1}^m[h_\theta(x^{(i)})-y^{(i)}]x^{(i)}_j$
+
+**Multi-core machines**
+
+Parallel cores in the same machine:
+
+<img src="machine_learning_WUENDA.assets/image-20220612203836831.png" alt="image-20220612203836831" style="zoom:50%;" />
+
+
+
+# Application example: Photo OCR
+
+## Problem discription and pipeline
+
+**The Photo OCR problem**
+
+1. text detection
+2. character segmentation
+3. Character classification
+
+Photo OCR pipeline:
+
+* image
+* text detection
+* Character segmentation
+* charactr recognition
+
+## Sliding windows
+
+<img src="machine_learning_WUENDA.assets/image-20220613101940995.png" alt="image-20220613101940995" style="zoom:50%;" />
+
+## Getting lots of data: artificial data synthesis
+
+artificial data synthesis: 人工数据合成
+
+**Artificial data synthesis for photo OCR**:
+
+take character from different fonts and paste it into a different background
+
+**Synthesizing data by introducing distortions**:
+
+<img src="machine_learning_WUENDA.assets/image-20220613103516534.png" alt="image-20220613103516534" style="zoom:50%;" />
+
+**Synthedizing data by introducing distortions: Speech recognition**
+
+* original audio 
+* audio with distortions: audio on bad cellphone connection
+* audio with distortions: noisy background --- crowd
+
+![image-20220613103918747](machine_learning_WUENDA.assets/image-20220613103918747.png)
+
+**Discussion on getting more data**
+
+1. make sure you have a low bias classifier befor expending the effort (plot learning curves). e.g. keep increasing the number od features/number of hidden units in neural network until you have a low bias classififer
+2. "How much work would it be to get 10x as much data as we currently have?"
+   1. Artificial data synthesis
+   2. Collect/label it yourself
+   3. "Crowd source"
+
+## Ceilng analysis: What part of the ppeline to work on next
+
+![image-20220613173541144](machine_learning_WUENDA.assets/image-20220613173541144.png)
+
+打勾：用所有正确的标签直接计算。依次将text detection, character segmentaton, character recognition打到100% accuracy.
+
+* It's better to improve the text detection system than to improve the character segmentation system.
+
+![image-20220613174050489](machine_learning_WUENDA.assets/image-20220613174050489.png)
+
+
+
+# summary
+
+![image-20220613174513713](machine_learning_WUENDA.assets/image-20220613174513713.png)
